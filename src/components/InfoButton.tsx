@@ -22,44 +22,38 @@ export function InfoButton() {
       <button
         onClick={() => setOpen((o) => !o)}
         aria-label="Comment ça marche"
-        className="flex h-7 w-7 items-center justify-center rounded-full bg-accent text-xs font-bold text-zinc-900 shadow-sm transition hover:bg-accent-dark hover:scale-110"
+        className="flex h-8 w-8 items-center justify-center rounded-full bg-accent text-sm font-extrabold text-zinc-900 shadow-sm transition hover:scale-110 hover:shadow-md"
       >
-        ?
+        i
       </button>
 
       {open && (
-        <div className="absolute left-1/2 top-full z-50 mt-2 w-[85vw] max-w-sm -translate-x-1/2 rounded-2xl border border-zinc-200 bg-card p-5 shadow-xl dark:border-zinc-800">
-          <h3 className="mb-1 text-sm font-bold">Comment ça marche</h3>
-          <p className="mb-3 text-xs text-muted">Certains films mythiques sont nés d'une seule ligne. Et si votre idée valait un million ?</p>
-
+        <div className="absolute left-1/2 top-full z-50 mt-2 w-[85vw] max-w-md -translate-x-1/2 rounded-2xl border border-zinc-200 bg-card p-6 shadow-xl dark:border-zinc-800">
+          <h3 className="mb-1 text-base font-bold">Comment ça marche</h3>
+          <p className="mb-4 text-xs text-muted">Un marché fictif pour tester la valeur d'une idée avant qu'elle existe.</p>
           <ol className="space-y-2.5 text-xs leading-relaxed text-muted">
             <li>
-              <span className="font-semibold text-accent">1.</span> Connectez-vous et recevez <span className="font-mono font-semibold text-accent">$100 000</span> fictifs — votre capital de départ.
+              <span className="font-semibold text-foreground">1.</span> Connectez-vous et recevez <span className="font-mono font-semibold text-accent">$100 000</span> fictifs — votre capital de départ.
             </li>
             <li>
-              <span className="font-semibold text-accent">2.</span> Pitchez une idée en une ligne : film, concept, jeu ou logiciel. La foule décide.
+              <span className="font-semibold text-foreground">2.</span> Pitchez une idée en une ligne : film, concept, jeu ou logiciel. La foule décide de sa valeur.
             </li>
             <li>
-              <span className="font-semibold text-accent">3.</span> Investissez sur les projets qui vous parlent (min. $10 000). Plus vous misez, plus vous croyez.
+              <span className="font-semibold text-foreground">3.</span> Investissez sur les idées des autres (min. $10 000). Plus une idée est financée, plus elle attire l'attention.
             </li>
             <li>
-              <span className="font-semibold text-accent">4.</span> L'auteur soumet un livrable — maquette, prototype, vidéo ou deck. Les investisseurs votent pour valider ou rejeter.
+              <span className="font-semibold text-foreground">4.</span> Les investisseurs peuvent proposer des <span className="font-semibold text-foreground">sous-idées</span> pour raffiner le concept, et même des <span className="font-semibold text-foreground">limbes</span> — un espace de discussion en profondeur.
             </li>
             <li>
-              <span className="font-semibold text-accent">5.</span> Projet validé → chaque investisseur détient des <span className="font-semibold text-foreground">parts proportionnelles</span> à sa mise.
+              <span className="font-semibold text-foreground">5.</span> L'auteur livre un prototype, une maquette ou un deck. Les investisseurs votent pour valider le livrable.
+            </li>
+            <li>
+              <span className="font-semibold text-foreground">6.</span> Projet validé → chaque investisseur détient des parts proportionnelles à sa mise. Vous devenez actionnaire de l'idée.
             </li>
           </ol>
-
-          <div className="mt-3 rounded-lg bg-zinc-100 p-3 dark:bg-zinc-800">
-            <p className="mb-1 text-xs font-semibold text-foreground">Raffiner ensemble</p>
-            <p className="text-xs text-muted">
-              Les investisseurs et l'auteur peuvent proposer des <span className="font-semibold text-foreground">sous-idées</span> pour explorer des variantes. Chaque sous-idée peut elle-même engendrer des <span className="font-semibold text-foreground">limbes</span> — un espace de discussion libre pour affiner le concept en profondeur.
-            </p>
-          </div>
-
           <button
             onClick={() => setOpen(false)}
-            className="mt-4 w-full rounded-lg bg-accent py-2 text-xs font-semibold text-zinc-900 transition hover:bg-accent-dark"
+            className="mt-5 w-full rounded-lg bg-accent py-2 text-xs font-semibold text-zinc-900 transition hover:bg-accent-dark"
           >
             Compris
           </button>

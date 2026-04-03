@@ -57,9 +57,9 @@ export function PitchCard({
               href={pitch.poc_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 rounded-full bg-emerald-600 px-2.5 py-1 text-xs font-semibold text-white shadow-sm transition hover:bg-emerald-700 hover:shadow dark:bg-emerald-700 dark:hover:bg-emerald-600"
+              className="inline-flex items-center gap-1 rounded-full bg-emerald-600 px-2.5 py-1 text-xs font-semibold text-white shadow-sm transition hover:bg-emerald-700 hover:shadow-md active:shadow-none dark:bg-emerald-700 dark:hover:bg-emerald-600"
             >
-              📄 Livrable ↗
+              📄 Livrable
             </a>
           )}
           {pitch.deck_url && (
@@ -67,9 +67,9 @@ export function PitchCard({
               href={pitch.deck_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 rounded-full bg-indigo-600 px-2.5 py-1 text-xs font-semibold text-white shadow-sm transition hover:bg-indigo-700 hover:shadow dark:bg-indigo-700 dark:hover:bg-indigo-600"
+              className="inline-flex items-center gap-1 rounded-full bg-indigo-600 px-2.5 py-1 text-xs font-semibold text-white shadow-sm transition hover:bg-indigo-700 hover:shadow-md active:shadow-none dark:bg-indigo-700 dark:hover:bg-indigo-600"
             >
-              📊 Deck ↗
+              📊 Deck
             </a>
           )}
         </div>
