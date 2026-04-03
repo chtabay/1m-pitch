@@ -258,8 +258,8 @@ export default async function PitchDetailPage({
       )}
 
       {pitch.depth === 0 && pitch.status !== "open" && (
-        <section className="mb-10">
-          <h2 className="mb-4 text-lg font-bold">Livrable</h2>
+        <section className="mb-10 rounded-2xl border border-zinc-200 bg-zinc-50 p-6 dark:border-zinc-800 dark:bg-zinc-900/50">
+          <h2 className="mb-4 text-lg font-bold">Ressources</h2>
 
           <div className="mb-4 flex flex-wrap gap-3">
             {pitch.poc_url && (
@@ -267,9 +267,10 @@ export default async function PitchDetailPage({
                 href={pitch.poc_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-block rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium transition hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
+                className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 dark:bg-emerald-700 dark:hover:bg-emerald-600"
               >
-                Voir le livrable →
+                📄 Livrable
+                <span className="text-emerald-200">↗</span>
               </a>
             )}
 
@@ -278,9 +279,10 @@ export default async function PitchDetailPage({
                 href={pitch.deck_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-block rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium transition hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
+                className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700 dark:bg-indigo-700 dark:hover:bg-indigo-600"
               >
-                Voir le deck →
+                📊 Deck
+                <span className="text-indigo-200">↗</span>
               </a>
             )}
           </div>
@@ -366,9 +368,10 @@ export default async function PitchDetailPage({
                   href={pitch.poc_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mb-4 inline-block rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium transition hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
+                  className="mb-4 inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 dark:bg-emerald-700 dark:hover:bg-emerald-600"
                 >
-                  Voir →
+                  📄 Voir la ressource
+                  <span className="text-emerald-200">↗</span>
                 </a>
               )}
 

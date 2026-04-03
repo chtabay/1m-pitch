@@ -57,10 +57,9 @@ export function PitchCard({
               href={pitch.poc_url}
               target="_blank"
               rel="noopener noreferrer"
-              title="Livrable"
-              className="text-base leading-none transition hover:scale-110"
+              className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-semibold text-emerald-800 transition hover:bg-emerald-200 dark:bg-emerald-900/40 dark:text-emerald-300 dark:hover:bg-emerald-900/60"
             >
-              📄
+              📄 Livrable
             </a>
           )}
           {pitch.deck_url && (
@@ -68,10 +67,9 @@ export function PitchCard({
               href={pitch.deck_url}
               target="_blank"
               rel="noopener noreferrer"
-              title="Deck"
-              className="text-base leading-none transition hover:scale-110"
+              className="inline-flex items-center gap-1 rounded-full bg-indigo-100 px-2.5 py-0.5 text-xs font-semibold text-indigo-800 transition hover:bg-indigo-200 dark:bg-indigo-900/40 dark:text-indigo-300 dark:hover:bg-indigo-900/60"
             >
-              📊
+              📊 Deck
             </a>
           )}
         </div>
