@@ -38,7 +38,9 @@ export async function invest(pitchId: string, amount: number) {
     .eq("id", pitchId)
     .single();
 
-  if (pitchData?.status !== "open") return { error: "Investissement clos" };
+  if (pitchData?.status === "validated" || pitchData?.status === "rejected") {
+    return { error: "Investissement clos" };
+  }
 
   const { error: voteError } = await supabase
     .from("votes")

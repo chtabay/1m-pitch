@@ -118,7 +118,7 @@ export function PitchCard({
             </>
           )}
         </div>
-        {pitch.status === "open" ? (
+        {pitch.status !== "validated" && pitch.status !== "rejected" ? (
           <PitchVoteButton
             pitchId={pitch.pitch_id}
             hasVoted={hasVoted}

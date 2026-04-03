@@ -47,6 +47,21 @@ export default async function PitchDetailPage({
     ? (votes ?? []).some((v) => v.voter_id === user.id)
     : false;
 
+  const voterIds = [...new Set((votes ?? []).map((v) => v.voter_id))];
+  const { data: investorProfiles } = voterIds.length > 0
+    ? await supabase.from("profiles").select("id, display_name").in("id", voterIds)
+    : { data: [] };
+
+  const investorNameMap = new Map(
+    (investorProfiles ?? []).map((p) => [p.id, p.display_name ?? "Anonyme"]),
+  );
+
+  const investors = (votes ?? []).map((v) => ({
+    id: v.voter_id,
+    name: investorNameMap.get(v.voter_id) ?? "Anonyme",
+    amount: v.amount,
+  })).sort((a, b) => b.amount - a.amount);
+
   const { data: images } = await supabase
     .from("poc_images")
     .select("id, storage_path")
@@ -202,7 +217,7 @@ export default async function PitchDetailPage({
       </div>
 
       {author && (
-        <p className="mb-8 text-sm text-muted">
+        <p className="mb-4 text-sm text-muted">
           par{" "}
           <Link
             href={`/profile/${pitch.author_id}`}
@@ -211,6 +226,21 @@ export default async function PitchDetailPage({
             {author.display_name}
           </Link>
         </p>
+      )}
+
+      {investors.length > 0 && (
+        <div className="mb-8 flex flex-wrap gap-2">
+          {investors.map((inv) => (
+            <Link
+              key={inv.id}
+              href={`/profile/${inv.id}`}
+              title={`${inv.name} — ${formatUSD(inv.amount)}`}
+              className="rounded-full bg-zinc-100 px-3 py-1 text-xs font-medium text-zinc-700 transition hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+            >
+              {inv.name}
+            </Link>
+          ))}
+        </div>
       )}
 
       {/* === Depth 0: formal deliverable workflow === */}
@@ -366,9 +396,16 @@ export default async function PitchDetailPage({
       {childLabel && (
         <section className="mb-10">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-lg font-bold">
-              {childLabel === "Idée" ? "Idées" : "Limbes"}
-            </h2>
+            <div>
+              <h2 className="text-lg font-bold">
+                {childLabel === "Idée" ? "Idées" : "Limbes"}
+              </h2>
+              <p className="text-xs text-muted">
+                {pitch.depth === 0
+                  ? "Les investisseurs et l'auteur peuvent proposer des sous-idées."
+                  : "Proposez un axe de réflexion dans les limbes."}
+              </p>
+            </div>
             {(isInvestor || isAuthor) && pitch.depth < 2 && (
               <NewIdeaForm parentId={pitch.id} depthLabel={childLabel} />
             )}
