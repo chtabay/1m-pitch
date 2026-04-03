@@ -1,0 +1,2 @@
+-- Backup copy of applied migration (see Supabase dashboard / MCP)
+-- pitch_kind, profiles, pitches, votes, RLS, pitch_stats view
