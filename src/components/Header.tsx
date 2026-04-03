@@ -32,7 +32,7 @@ export async function Header() {
             <>
               <Link
                 href={`/profile/${user.id}`}
-                className="flex items-center gap-1.5 rounded-lg border border-zinc-300 px-2 py-1.5 text-xs sm:px-3 sm:text-sm transition hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
+                className="flex items-center gap-1.5 rounded-lg border border-zinc-300 bg-card px-2 py-1.5 text-xs sm:px-3 sm:text-sm shadow-[0_2px_0_0_theme(colors.zinc.400)] transition-all hover:-translate-y-0.5 hover:shadow-[0_4px_0_0_theme(colors.zinc.400)] active:translate-y-0 active:shadow-[0_0px_0_0_theme(colors.zinc.400)] dark:border-zinc-700 dark:shadow-[0_2px_0_0_theme(colors.zinc.800)] dark:hover:shadow-[0_4px_0_0_theme(colors.zinc.800)]"
               >
                 <span className="font-mono font-semibold text-accent">
                   {formatUSD(balance)}
