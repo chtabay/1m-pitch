@@ -14,7 +14,8 @@ type PitchStat = {
   kind: "film" | "concept";
   status: "open" | "poc_submitted" | "validated" | "rejected";
   poc_url: string | null;
-  created_at: string;
+    deck_url: string | null;
+    created_at: string;
   vote_count: number;
   potential_usd: number;
 };

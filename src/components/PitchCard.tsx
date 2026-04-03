@@ -11,6 +11,7 @@ type Props = {
     kind: "film" | "concept";
     status: "open" | "poc_submitted" | "validated" | "rejected";
     poc_url: string | null;
+    deck_url: string | null;
     created_at: string;
     vote_count: number;
     potential_usd: number;
@@ -47,6 +48,30 @@ export function PitchCard({
             {pitch.kind}
           </span>
           {pitch.status !== "open" && <StatusBadge status={pitch.status} />}
+          {pitch.poc_url && (
+            <a
+              href={pitch.poc_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              title="Livrable"
+              className="text-base leading-none transition hover:scale-110"
+              onClick={(e) => e.stopPropagation()}
+            >
+              📄
+            </a>
+          )}
+          {pitch.deck_url && (
+            <a
+              href={pitch.deck_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              title="Deck"
+              className="text-base leading-none transition hover:scale-110"
+              onClick={(e) => e.stopPropagation()}
+            >
+              📊
+            </a>
+          )}
         </div>
         <div className="flex items-center gap-2">
           {isOwner && (
