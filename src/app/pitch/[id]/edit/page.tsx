@@ -53,6 +53,7 @@ export default async function EditPitchPage({
           >
             <option value="film">Film</option>
             <option value="concept">Concept</option>
+            <option value="jeu">Jeu</option>
           </select>
         </div>
 

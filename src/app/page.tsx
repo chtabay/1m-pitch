@@ -11,7 +11,7 @@ type PitchStat = {
   depth: number;
   title: string;
   one_liner: string;
-  kind: "film" | "concept";
+  kind: "film" | "concept" | "jeu";
   status: "open" | "poc_submitted" | "validated" | "rejected";
   poc_url: string | null;
     deck_url: string | null;
@@ -39,7 +39,7 @@ export default async function Home({
 
   let query = supabase.from("pitch_stats").select("*").eq("depth", 0).limit(50);
 
-  if (kind === "film" || kind === "concept") {
+  if (kind === "film" || kind === "concept" || kind === "jeu") {
     query = query.eq("kind", kind);
   }
 
@@ -100,7 +100,7 @@ export default async function Home({
       </section>
 
       <div className="mb-8 flex flex-wrap items-center justify-center gap-2">
-        {(["all", "film", "concept"] as const).map((k) => (
+        {(["all", "film", "concept", "jeu"] as const).map((k) => (
           <Link
             key={k}
             href={buildHref({ kind: k })}
@@ -110,7 +110,7 @@ export default async function Home({
                 : "border border-zinc-300 text-muted hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
             }`}
           >
-            {k === "all" ? "Tous" : k === "film" ? "Films" : "Concepts"}
+            {k === "all" ? "Tous" : k === "film" ? "Films" : k === "concept" ? "Concepts" : "Jeux"}
           </Link>
         ))}
 
