@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { PitchCard } from "@/components/PitchCard";
+import { SearchBar } from "@/components/SearchBar";
 import Link from "next/link";
 
 export const revalidate = 30;
@@ -25,9 +26,9 @@ type SortKey = "funded" | "recent" | "trending";
 export default async function Home({
   searchParams,
 }: {
-  searchParams: Promise<{ kind?: string; sort?: string }>;
+  searchParams: Promise<{ kind?: string; sort?: string; q?: string }>;
 }) {
-  const { kind, sort } = await searchParams;
+  const { kind, sort, q } = await searchParams;
   const supabase = await createClient();
 
   const {
@@ -41,6 +42,13 @@ export default async function Home({
 
   if (kind === "film" || kind === "concept" || kind === "jeu" || kind === "logiciel") {
     query = query.eq("kind", kind);
+  }
+
+  const searchTerm = typeof q === "string" ? q.trim() : "";
+  if (searchTerm) {
+    query = query.or(
+      `title.ilike.%${searchTerm}%,one_liner.ilike.%${searchTerm}%`,
+    );
   }
 
   if (activeSort === "recent") {
@@ -87,6 +95,7 @@ export default async function Home({
     const s = params.sort ?? sort;
     if (k && k !== "all") p.set("kind", k);
     if (s && s !== "funded") p.set("sort", s);
+    if (searchTerm) p.set("q", searchTerm);
     const qs = p.toString();
     return qs ? `/?${qs}` : "/";
   };
@@ -98,6 +107,10 @@ export default async function Home({
           Un pitch. <span className="text-accent">$1&nbsp;000&nbsp;000.</span>
         </h1>
       </section>
+
+      <div className="mb-4 flex justify-center">
+        <SearchBar defaultValue={searchTerm} />
+      </div>
 
       <div className="mb-8 flex flex-wrap items-center justify-center gap-2">
         {(["all", "film", "concept", "jeu", "logiciel"] as const).map((k) => (
