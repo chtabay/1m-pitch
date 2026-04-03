@@ -57,7 +57,7 @@ export function PitchCard({
               href={pitch.poc_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 rounded-full bg-emerald-600 px-2.5 py-1 text-xs font-semibold text-white shadow-sm transition hover:bg-emerald-700 hover:shadow-md active:shadow-none dark:bg-emerald-700 dark:hover:bg-emerald-600"
+              className="inline-flex items-center gap-1 rounded-full bg-emerald-600 px-2.5 py-1 text-xs font-semibold text-white shadow-[0_2px_0_0_theme(colors.emerald.800)] transition-all hover:-translate-y-0.5 hover:shadow-[0_4px_0_0_theme(colors.emerald.800)] active:translate-y-0 active:shadow-[0_0px_0_0_theme(colors.emerald.800)] dark:bg-emerald-700 dark:shadow-[0_2px_0_0_theme(colors.emerald.950)] dark:hover:shadow-[0_4px_0_0_theme(colors.emerald.950)]"
             >
               📄 Livrable
             </a>
@@ -67,7 +67,7 @@ export function PitchCard({
               href={pitch.deck_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 rounded-full bg-indigo-600 px-2.5 py-1 text-xs font-semibold text-white shadow-sm transition hover:bg-indigo-700 hover:shadow-md active:shadow-none dark:bg-indigo-700 dark:hover:bg-indigo-600"
+              className="inline-flex items-center gap-1 rounded-full bg-indigo-600 px-2.5 py-1 text-xs font-semibold text-white shadow-[0_2px_0_0_theme(colors.indigo.800)] transition-all hover:-translate-y-0.5 hover:shadow-[0_4px_0_0_theme(colors.indigo.800)] active:translate-y-0 active:shadow-[0_0px_0_0_theme(colors.indigo.800)] dark:bg-indigo-700 dark:shadow-[0_2px_0_0_theme(colors.indigo.950)] dark:hover:shadow-[0_4px_0_0_theme(colors.indigo.950)]"
             >
               📊 Deck
             </a>
