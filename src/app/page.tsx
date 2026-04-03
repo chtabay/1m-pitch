@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { PitchCard } from "@/components/PitchCard";
 import { SearchBar } from "@/components/SearchBar";
+import { InfoButton } from "@/components/InfoButton";
 import Link from "next/link";
 
 export const revalidate = 30;
@@ -103,9 +104,12 @@ export default async function Home({
   return (
     <div className="mx-auto max-w-5xl px-4 py-10">
       <section className="mb-12 text-center">
-        <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl">
-          Un pitch. <span className="text-accent">$1&nbsp;000&nbsp;000.</span>
-        </h1>
+        <div className="flex items-center justify-center gap-2">
+          <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl">
+            Un pitch. <span className="text-accent">$1&nbsp;000&nbsp;000.</span>
+          </h1>
+          <InfoButton />
+        </div>
       </section>
 
       <div className="mb-4 flex justify-center">
