@@ -55,7 +55,6 @@ export function PitchCard({
               rel="noopener noreferrer"
               title="Livrable"
               className="text-base leading-none transition hover:scale-110"
-              onClick={(e) => e.stopPropagation()}
             >
               📄
             </a>
@@ -67,7 +66,6 @@ export function PitchCard({
               rel="noopener noreferrer"
               title="Deck"
               className="text-base leading-none transition hover:scale-110"
-              onClick={(e) => e.stopPropagation()}
             >
               📊
             </a>
