@@ -27,21 +27,21 @@ export async function Header() {
           <span>1M&nbsp;Pitch</span>
         </Link>
 
-        <nav className="flex items-center gap-4">
+        <nav className="flex items-center gap-2 sm:gap-4">
           {user && (
             <>
               <Link
                 href={`/profile/${user.id}`}
-                className="flex items-center gap-1.5 rounded-lg border border-zinc-300 px-3 py-1.5 transition hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
+                className="flex items-center gap-1.5 rounded-lg border border-zinc-300 px-2 py-1.5 text-xs sm:px-3 sm:text-sm transition hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
               >
-                <span className="font-mono text-sm font-semibold text-accent">
+                <span className="font-mono font-semibold text-accent">
                   {formatUSD(balance)}
                 </span>
-                <span className="text-xs text-muted">▸</span>
+                <span className="text-muted">▸</span>
               </Link>
               <Link
                 href="/pitch/new"
-                className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-zinc-900 transition hover:bg-accent-dark"
+                className="whitespace-nowrap rounded-lg bg-accent px-3 py-2 text-xs sm:px-4 sm:text-sm font-semibold text-zinc-900 transition hover:bg-accent-dark"
               >
                 + Pitch
               </Link>
