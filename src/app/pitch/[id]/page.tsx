@@ -8,6 +8,7 @@ import { ResourceForm } from "@/components/ResourceForm";
 import { StatusBadge } from "@/components/StatusBadge";
 import { NewIdeaForm } from "@/components/NewIdeaForm";
 import { MessageForm } from "@/components/MessageForm";
+import { ShareButtons } from "@/components/ShareButtons";
 
 const DEPTH_LABELS = ["Pitch", "Idée", "Limbe"] as const;
 
@@ -200,6 +201,8 @@ export default async function PitchDetailPage({
           ))}
         </div>
       )}
+
+      <ShareButtons title={pitch.title} oneLiner={pitch.one_liner} pitchId={pitch.id} />
 
       {/* === Depth 0: formal deliverable workflow === */}
       {pitch.depth === 0 && (pitch.status === "open" || pitch.status === "rejected") && isAuthor && (
