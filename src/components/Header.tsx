@@ -1,13 +1,10 @@
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getUser } from "@/lib/supabase/server";
 import { AuthButton } from "./AuthButton";
 import { formatUSD } from "@/lib/format";
 
 export async function Header() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const [user, supabase] = await Promise.all([getUser(), createClient()]);
 
   let balance = 0;
   if (user) {

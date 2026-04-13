@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getUser } from "@/lib/supabase/server";
 import { PitchCard } from "@/components/PitchCard";
 import { SearchBar } from "@/components/SearchBar";
 import { InfoButton } from "@/components/InfoButton";
@@ -30,11 +30,7 @@ export default async function Home({
   searchParams: Promise<{ kind?: string; sort?: string; q?: string }>;
 }) {
   const { kind, sort, q } = await searchParams;
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const [supabase, user] = await Promise.all([createClient(), getUser()]);
 
   const activeSort: SortKey =
     sort === "recent" || sort === "trending" ? sort : "funded";
@@ -61,32 +57,28 @@ export default async function Home({
   const { data: pitches } = await query;
 
   const authorIds = [...new Set((pitches ?? []).map((p) => p.author_id))];
-  const { data: profiles } = await supabase
-    .from("profiles")
-    .select("id, display_name")
-    .in("id", authorIds.length > 0 ? authorIds : ["__none__"]);
+
+  const [profilesResult, votesResult, balanceResult] = await Promise.all([
+    supabase
+      .from("profiles")
+      .select("id, display_name")
+      .in("id", authorIds.length > 0 ? authorIds : ["__none__"]),
+    user
+      ? supabase.from("votes").select("pitch_id").eq("voter_id", user.id)
+      : null,
+    user
+      ? supabase.from("profiles").select("balance").eq("id", user.id).single()
+      : null,
+  ]);
 
   const profileMap = new Map(
-    (profiles ?? []).map((p) => [p.id, p.display_name]),
+    (profilesResult.data ?? []).map((p) => [p.id, p.display_name]),
   );
 
-  let userVotes = new Set<string>();
-  let userBalance = 0;
-
-  if (user) {
-    const { data: votes } = await supabase
-      .from("votes")
-      .select("pitch_id")
-      .eq("voter_id", user.id);
-    userVotes = new Set((votes ?? []).map((v) => v.pitch_id));
-
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("balance")
-      .eq("id", user.id)
-      .single();
-    userBalance = profile?.balance ?? 0;
-  }
+  const userVotes = new Set(
+    (votesResult?.data ?? []).map((v) => v.pitch_id),
+  );
+  const userBalance = balanceResult?.data?.balance ?? 0;
 
   const activeKind = kind ?? "all";
 

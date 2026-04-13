@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getUser } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import { formatUSD, timeAgo } from "@/lib/format";
 import Link from "next/link";
@@ -27,133 +27,87 @@ export default async function PitchDetailPage({
 
   if (!pitch) notFound();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  const isAuthor = user?.id === pitch.author_id;
   const depthLabel = DEPTH_LABELS[pitch.depth] ?? "Pitch";
   const childLabel = DEPTH_LABELS[pitch.depth + 1] ?? null;
+  const hasValidations = pitch.status === "poc_submitted" || pitch.status === "validated" || pitch.status === "rejected";
 
-  const { data: votes } = await supabase
-    .from("votes")
-    .select("id, amount, voter_id")
-    .eq("pitch_id", id);
+  const [
+    user,
+    { data: votes },
+    { data: images },
+    { data: author },
+    validationsResult,
+    { data: children },
+    { data: archivedChildren },
+    messagesResult,
+  ] = await Promise.all([
+    getUser(),
+    supabase.from("votes").select("id, amount, voter_id").eq("pitch_id", id),
+    supabase.from("poc_images").select("id, storage_path").eq("pitch_id", id),
+    supabase.from("profiles").select("display_name").eq("id", pitch.author_id).single(),
+    hasValidations
+      ? supabase.from("poc_validations").select("voter_id, approved").eq("pitch_id", id)
+      : Promise.resolve({ data: null }),
+    supabase.from("pitch_stats").select("*").eq("parent_id", id).neq("status", "rejected").order("potential_usd", { ascending: false }),
+    supabase.from("pitch_stats").select("*").eq("parent_id", id).eq("status", "rejected").order("created_at", { ascending: false }),
+    pitch.depth === 2
+      ? supabase.from("messages").select("id, content, created_at, author_id").eq("pitch_id", id).order("created_at", { ascending: true })
+      : Promise.resolve({ data: null }),
+  ]);
+
+  const isAuthor = user?.id === pitch.author_id;
 
   const totalFunded = (votes ?? []).reduce((s, v) => s + v.amount, 0);
   const investorCount = (votes ?? []).length;
-
-  const isInvestor = user
-    ? (votes ?? []).some((v) => v.voter_id === user.id)
-    : false;
+  const isInvestor = user ? (votes ?? []).some((v) => v.voter_id === user.id) : false;
 
   const voterIds = [...new Set((votes ?? []).map((v) => v.voter_id))];
-  const { data: investorProfiles } = voterIds.length > 0
-    ? await supabase.from("profiles").select("id, display_name").in("id", voterIds)
-    : { data: [] };
 
-  const investorNameMap = new Map(
-    (investorProfiles ?? []).map((p) => [p.id, p.display_name ?? "Anonyme"]),
+  const messages = messagesResult.data ?? [];
+  const messageAuthorIds = messages.length > 0
+    ? [...new Set(messages.map((m) => m.author_id))]
+    : [];
+
+  const allProfileIds = [...new Set([...voterIds, ...messageAuthorIds])];
+  const { data: allProfiles } = allProfileIds.length > 0
+    ? await supabase.from("profiles").select("id, display_name").in("id", allProfileIds)
+    : { data: [] as { id: string; display_name: string | null }[] };
+
+  const profileNameMap = new Map(
+    (allProfiles ?? []).map((p) => [p.id, p.display_name ?? "Anonyme"]),
   );
 
   const investors = (votes ?? []).map((v) => ({
     id: v.voter_id,
-    name: investorNameMap.get(v.voter_id) ?? "Anonyme",
+    name: profileNameMap.get(v.voter_id) ?? "Anonyme",
     amount: v.amount,
   })).sort((a, b) => b.amount - a.amount);
 
-  const { data: images } = await supabase
-    .from("poc_images")
-    .select("id, storage_path")
-    .eq("pitch_id", id);
-
   const imageUrls = (images ?? []).map((img) => {
-    const { data } = supabase.storage
-      .from("poc-images")
-      .getPublicUrl(img.storage_path);
+    const { data } = supabase.storage.from("poc-images").getPublicUrl(img.storage_path);
     return data.publicUrl;
   });
-
-  const { data: author } = await supabase
-    .from("profiles")
-    .select("display_name")
-    .eq("id", pitch.author_id)
-    .single();
 
   let userValidation: boolean | null = null;
   let approvalCount = 0;
   let rejectionCount = 0;
-
-  if (pitch.status === "poc_submitted" || pitch.status === "validated" || pitch.status === "rejected") {
-    const { data: validations } = await supabase
-      .from("poc_validations")
-      .select("voter_id, approved")
-      .eq("pitch_id", id);
-
-    approvalCount = (validations ?? []).filter((v) => v.approved).length;
-    rejectionCount = (validations ?? []).filter((v) => !v.approved).length;
-
+  const validations = validationsResult.data ?? [];
+  if (hasValidations) {
+    approvalCount = validations.filter((v) => v.approved).length;
+    rejectionCount = validations.filter((v) => !v.approved).length;
     if (user) {
-      const mine = (validations ?? []).find((v) => v.voter_id === user.id);
+      const mine = validations.find((v) => v.voter_id === user.id);
       userValidation = mine?.approved ?? null;
     }
   }
 
-  const { data: children } = await supabase
-    .from("pitch_stats")
-    .select("*")
-    .eq("parent_id", id)
-    .neq("status", "rejected")
-    .order("potential_usd", { ascending: false });
-
-  const { data: archivedChildren } = await supabase
-    .from("pitch_stats")
-    .select("*")
-    .eq("parent_id", id)
-    .eq("status", "rejected")
-    .order("created_at", { ascending: false });
-
-  let messages: { id: string; content: string; created_at: string; author_id: string }[] = [];
-  let messageAuthors = new Map<string, string>();
-
-  if (pitch.depth === 2) {
-    const { data: msgs } = await supabase
-      .from("messages")
-      .select("id, content, created_at, author_id")
-      .eq("pitch_id", id)
-      .order("created_at", { ascending: true });
-
-    messages = msgs ?? [];
-
-    if (messages.length > 0) {
-      const authorIds = [...new Set(messages.map((m) => m.author_id))];
-      const { data: profiles } = await supabase
-        .from("profiles")
-        .select("id, display_name")
-        .in("id", authorIds);
-
-      messageAuthors = new Map(
-        (profiles ?? []).map((p) => [p.id, p.display_name ?? "Anonyme"]),
-      );
-    }
-  }
+  const messageAuthors = profileNameMap;
 
   let shareholders: { name: string; profileId: string; amount: number; share: number }[] = [];
-
   if (pitch.status === "validated" && totalFunded > 0) {
-    const voterIds = [...new Set((votes ?? []).map((v) => v.voter_id))];
-    const { data: voterProfiles } = await supabase
-      .from("profiles")
-      .select("id, display_name")
-      .in("id", voterIds);
-
-    const nameMap = new Map(
-      (voterProfiles ?? []).map((p) => [p.id, p.display_name ?? "Anonyme"]),
-    );
-
     shareholders = (votes ?? [])
       .map((v) => ({
-        name: nameMap.get(v.voter_id) ?? "Anonyme",
+        name: profileNameMap.get(v.voter_id) ?? "Anonyme",
         profileId: v.voter_id,
         amount: v.amount,
         share: (v.amount / totalFunded) * 100,

@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getUser } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import { formatUSD, timeAgo } from "@/lib/format";
 import Link from "next/link";
@@ -20,23 +20,17 @@ export default async function ProfilePage({
 
   if (!profile) notFound();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const [
+    user,
+    { data: pitches },
+    { data: investments },
+  ] = await Promise.all([
+    getUser(),
+    supabase.from("pitch_stats").select("*").eq("author_id", id).order("created_at", { ascending: false }),
+    supabase.from("votes").select("id, amount, created_at, pitch_id").eq("voter_id", id).order("created_at", { ascending: false }),
+  ]);
 
   const isOwner = user?.id === profile.id;
-
-  const { data: pitches } = await supabase
-    .from("pitch_stats")
-    .select("*")
-    .eq("author_id", id)
-    .order("created_at", { ascending: false });
-
-  const { data: investments } = await supabase
-    .from("votes")
-    .select("id, amount, created_at, pitch_id")
-    .eq("voter_id", id)
-    .order("created_at", { ascending: false });
 
   const pitchIds = (investments ?? []).map((v) => v.pitch_id);
   const { data: investedPitches } = await supabase
