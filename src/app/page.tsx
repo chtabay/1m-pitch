@@ -96,12 +96,15 @@ export default async function Home({
   return (
     <div className="mx-auto max-w-5xl px-4 py-10">
       <section className="mb-12 text-center">
-        <div className="flex items-center justify-center gap-2">
-          <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl">
-            Un pitch. <span className="text-accent">$1&nbsp;000&nbsp;000.</span>
+        <div className="flex items-center justify-center gap-3">
+          <h1 className="font-serif text-4xl font-black tracking-tight sm:text-5xl">
+            Un pitch.{" "}
+            <span className="animate-float inline-block text-accent text-5xl sm:text-6xl">$</span>
+            <span className="text-accent">1&nbsp;000&nbsp;000.</span>
           </h1>
           <InfoButton />
         </div>
+        <hr className="mx-auto mt-6 w-24 border-t-2 border-ink" />
       </section>
 
       <div className="mb-4 flex justify-center">
@@ -115,8 +118,8 @@ export default async function Home({
             href={buildHref({ kind: k })}
             className={`rounded-full px-4 py-1.5 text-sm font-medium transition ${
               activeKind === k
-                ? "bg-foreground text-background"
-                : "border border-zinc-300 text-muted hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
+                ? "border-2 border-ink bg-foreground text-background shadow-[2px_2px_0_0_theme(colors.ink)]"
+                : "border border-ink/30 text-muted hover:border-ink hover:bg-card"
             }`}
           >
             {k === "all" ? "Tous" : k === "film" ? "Films" : k === "concept" ? "Concepts" : k === "jeu" ? "Jeux" : "Logiciels"}
@@ -136,8 +139,8 @@ export default async function Home({
             href={buildHref({ sort: s })}
             className={`rounded-full px-3 py-1.5 text-sm font-medium transition ${
               activeSort === s
-                ? "bg-foreground text-background"
-                : "border border-zinc-300 text-muted hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
+                ? "border-2 border-ink bg-foreground text-background shadow-[2px_2px_0_0_theme(colors.ink)]"
+                : "border border-ink/30 text-muted hover:border-ink hover:bg-card"
             }`}
           >
             {icon}

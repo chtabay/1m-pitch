@@ -32,7 +32,7 @@ export function PitchVoteButton({
         type="button"
         disabled={pending}
         onClick={() => startTransition(() => withdrawVote(pitchId))}
-        className="rounded-lg bg-amber-100 px-3 py-1.5 text-sm font-medium text-amber-900 transition hover:bg-amber-200 dark:bg-amber-900/40 dark:text-amber-100 disabled:opacity-50"
+        className="rounded-lg border border-ink bg-amber-100 px-3 py-1.5 text-sm font-medium text-amber-900 shadow-[2px_2px_0_0_theme(colors.ink)] transition-all hover:-translate-y-0.5 hover:shadow-[3px_3px_0_0_theme(colors.ink)] active:translate-y-0 active:shadow-none dark:bg-amber-900/40 dark:text-amber-100 disabled:opacity-50"
       >
         {pending ? "…" : "★ Investi"}
       </button>
@@ -45,7 +45,7 @@ export function PitchVoteButton({
         type="button"
         disabled={disabled || userBalance < MIN}
         onClick={() => setOpen(true)}
-        className="rounded-lg border border-zinc-300 px-3 py-1.5 text-sm font-medium text-zinc-700 transition hover:bg-zinc-100 dark:border-zinc-600 dark:text-zinc-300 dark:hover:bg-zinc-800 disabled:opacity-50"
+        className="rounded-lg border border-ink px-3 py-1.5 text-sm font-medium text-foreground shadow-[2px_2px_0_0_theme(colors.ink)] transition-all hover:-translate-y-0.5 hover:shadow-[3px_3px_0_0_theme(colors.ink)] active:translate-y-0 active:shadow-none disabled:opacity-50"
       >
         ☆ Investir
       </button>
@@ -82,7 +82,7 @@ export function PitchVoteButton({
         type="button"
         disabled={pending || amount > userBalance}
         onClick={handleInvest}
-        className="rounded-lg bg-accent px-3 py-1.5 text-sm font-semibold text-zinc-900 transition hover:bg-accent-dark disabled:opacity-50"
+        className="rounded-lg border border-ink bg-accent px-3 py-1.5 text-sm font-semibold text-zinc-900 shadow-[2px_2px_0_0_theme(colors.ink)] transition-all hover:-translate-y-0.5 hover:shadow-[3px_3px_0_0_theme(colors.ink)] active:translate-y-0 active:shadow-none disabled:opacity-50"
       >
         {pending ? "…" : "Go"}
       </button>

@@ -33,7 +33,7 @@ export function SearchBar({ defaultValue }: { defaultValue: string }) {
         onKeyDown={(e) => {
           if (e.key === "Enter") handleSearch(e.currentTarget.value);
         }}
-        className="w-full rounded-full border border-zinc-300 bg-background px-4 py-2 pl-10 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/30 dark:border-zinc-700"
+        className="w-full rounded-full border-2 border-ink bg-card px-4 py-2 pl-10 text-sm outline-none shadow-[2px_2px_0_0_theme(colors.ink)] transition focus:shadow-[3px_3px_0_0_theme(colors.accent)]"
       />
       <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted">
         ⌕

@@ -22,7 +22,7 @@ export default function HomeLoading() {
         {Array.from({ length: 6 }).map((_, i) => (
           <div
             key={i}
-            className="rounded-2xl border border-zinc-200 p-5 dark:border-zinc-800"
+            className="rounded-2xl border-2 border-ink/20 bg-card p-5 shadow-[4px_4px_0_0_theme(colors.ink/0.1)]"
           >
             <div className="mb-3 flex items-center gap-2">
               <div className="h-5 w-16 animate-pulse rounded-full bg-zinc-200 dark:bg-zinc-800" />

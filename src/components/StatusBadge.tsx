@@ -13,7 +13,7 @@ export function StatusBadge({ status }: Props) {
   const config = STATUS_CONFIG[status];
   return (
     <span
-      className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${config.className}`}
+      className={`rounded-full border border-ink px-2.5 py-0.5 text-xs font-semibold ${config.className}`}
     >
       {config.label}
     </span>

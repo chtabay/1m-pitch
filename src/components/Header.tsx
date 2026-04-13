@@ -17,10 +17,10 @@ export async function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-zinc-200 bg-card/80 backdrop-blur dark:border-zinc-800">
+    <header className="sticky top-0 z-50 border-b-2 border-ink bg-card/90 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4">
-        <Link href="/" className="flex items-center gap-2 font-bold text-lg">
-          <span className="text-accent text-2xl">$</span>
+        <Link href="/" className="flex items-center gap-2 font-serif font-bold text-lg">
+          <span className="inline-block text-accent text-3xl -rotate-6 transition-transform hover:rotate-0">$</span>
           <span>1M&nbsp;Pitch</span>
         </Link>
 
@@ -29,7 +29,7 @@ export async function Header() {
             <>
               <Link
                 href={`/profile/${user.id}`}
-                className="flex items-center gap-1.5 rounded-lg border border-zinc-300 bg-card px-2 py-1.5 text-xs sm:px-3 sm:text-sm shadow-[0_2px_0_0_theme(colors.zinc.400)] transition-all hover:-translate-y-0.5 hover:shadow-[0_4px_0_0_theme(colors.zinc.400)] active:translate-y-0 active:shadow-[0_0px_0_0_theme(colors.zinc.400)] dark:border-zinc-700 dark:shadow-[0_2px_0_0_theme(colors.zinc.800)] dark:hover:shadow-[0_4px_0_0_theme(colors.zinc.800)]"
+                className="flex items-center gap-1.5 rounded-lg border-2 border-ink bg-card px-2 py-1.5 text-xs sm:px-3 sm:text-sm shadow-[2px_2px_0_0_theme(colors.ink)] transition-all hover:-translate-y-0.5 hover:shadow-[3px_3px_0_0_theme(colors.ink)] active:translate-y-0 active:shadow-[0_0px_0_0_theme(colors.ink)]"
               >
                 <span className="font-mono font-semibold text-accent">
                   {formatUSD(balance)}
@@ -38,7 +38,7 @@ export async function Header() {
               </Link>
               <Link
                 href="/pitch/new"
-                className="whitespace-nowrap rounded-lg bg-accent px-3 py-2 text-xs sm:px-4 sm:text-sm font-semibold text-zinc-900 transition hover:bg-accent-dark"
+                className="whitespace-nowrap rounded-lg border-2 border-ink bg-accent px-3 py-2 text-xs sm:px-4 sm:text-sm font-semibold text-zinc-900 shadow-[2px_2px_0_0_theme(colors.ink)] transition-all hover:-translate-y-0.5 hover:shadow-[3px_3px_0_0_theme(colors.ink)] active:translate-y-0 active:shadow-[0_0px_0_0_theme(colors.ink)]"
               >
                 + Pitch
               </Link>

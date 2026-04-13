@@ -35,11 +35,11 @@ export function PitchCard({
   const progress = Math.min(100, (pitch.potential_usd / 1_000_000) * 100);
 
   return (
-    <article className="group rounded-2xl border border-zinc-200 bg-card p-5 transition hover:shadow-lg dark:border-zinc-800">
+    <article className="group rounded-2xl border-2 border-ink bg-card p-5 shadow-[4px_4px_0_0_theme(colors.ink)] transition-all duration-200 hover:-translate-y-1 hover:shadow-[6px_6px_0_0_theme(colors.ink)]">
       <div className="mb-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span
-            className={`rounded-full px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wide ${
+            className={`rounded-full border border-ink px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wide ${
               pitch.kind === "film"
                 ? "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300"
                 : pitch.kind === "jeu"
@@ -87,7 +87,7 @@ export function PitchCard({
       </div>
 
       <Link href={`/pitch/${pitch.pitch_id}`} className="block">
-        <h2 className="mb-1 text-lg font-bold leading-snug group-hover:text-accent transition">
+        <h2 className="mb-1 font-serif text-lg font-bold leading-snug group-hover:text-accent transition">
           {pitch.title}
         </h2>
         <p className="mb-4 text-sm leading-relaxed text-muted">
@@ -102,9 +102,9 @@ export function PitchCard({
           </span>
           <span className="text-muted">/ $1,000,000</span>
         </div>
-        <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-700">
+        <div className="h-2.5 w-full overflow-hidden rounded-full border border-ink bg-zinc-200 dark:bg-zinc-700">
           <div
-            className="h-full rounded-full bg-gradient-to-r from-amber-400 to-amber-600 transition-all duration-500"
+            className="progress-shine h-full rounded-full bg-gradient-to-r from-amber-400 to-amber-600 transition-all duration-500"
             style={{ width: `${progress}%` }}
           />
         </div>
