@@ -9,8 +9,44 @@ import { StatusBadge } from "@/components/StatusBadge";
 import { NewIdeaForm } from "@/components/NewIdeaForm";
 import { MessageForm } from "@/components/MessageForm";
 import { ShareButtons } from "@/components/ShareButtons";
+import type { Metadata } from "next";
 
 const DEPTH_LABELS = ["Pitch", "Idée", "Limbe"] as const;
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const supabase = await createClient();
+  const { data: pitch } = await supabase
+    .from("pitches")
+    .select("title, one_liner, kind")
+    .eq("id", id)
+    .single();
+
+  if (!pitch) return { title: "Pitch introuvable" };
+
+  const title = `${pitch.title} — 1M Pitch`;
+  const description = pitch.one_liner;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: "article",
+      siteName: "1M Pitch",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+    },
+  };
+}
 
 export default async function PitchDetailPage({
   params,
