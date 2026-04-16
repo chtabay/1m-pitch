@@ -2,6 +2,7 @@ import { createClient, getUser } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import { formatUSD, timeAgo } from "@/lib/format";
 import Link from "next/link";
+import Image from "next/image";
 import { StatusBadge } from "@/components/StatusBadge";
 
 export default async function ProfilePage({
@@ -12,23 +13,19 @@ export default async function ProfilePage({
   const { id } = await params;
   const supabase = await createClient();
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("id, display_name, avatar_url, balance, created_at")
-    .eq("id", id)
-    .single();
+  const [{ data: profile }, user, { data: pitches }, { data: investments }] =
+    await Promise.all([
+      supabase
+        .from("profiles")
+        .select("id, display_name, avatar_url, balance, created_at")
+        .eq("id", id)
+        .single(),
+      getUser(),
+      supabase.from("pitch_stats").select("*").eq("author_id", id).order("created_at", { ascending: false }),
+      supabase.from("votes").select("id, amount, created_at, pitch_id").eq("voter_id", id).order("created_at", { ascending: false }),
+    ]);
 
   if (!profile) notFound();
-
-  const [
-    user,
-    { data: pitches },
-    { data: investments },
-  ] = await Promise.all([
-    getUser(),
-    supabase.from("pitch_stats").select("*").eq("author_id", id).order("created_at", { ascending: false }),
-    supabase.from("votes").select("id, amount, created_at, pitch_id").eq("voter_id", id).order("created_at", { ascending: false }),
-  ]);
 
   const isOwner = user?.id === profile.id;
 
@@ -92,9 +89,11 @@ export default async function ProfilePage({
 
       <div className="mb-10 flex items-center gap-4">
         {profile.avatar_url && (
-          <img
+          <Image
             src={profile.avatar_url}
             alt=""
+            width={56}
+            height={56}
             className="h-14 w-14 rounded-full"
           />
         )}

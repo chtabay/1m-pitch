@@ -2,6 +2,7 @@ import { createClient, getUser } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import { formatUSD, timeAgo } from "@/lib/format";
 import Link from "next/link";
+import Image from "next/image";
 import { PocSubmitForm } from "@/components/PocSubmitForm";
 import { PocValidateButton } from "@/components/PocValidateButton";
 import { ResourceForm } from "@/components/ResourceForm";
@@ -10,8 +11,19 @@ import { NewIdeaForm } from "@/components/NewIdeaForm";
 import { MessageForm } from "@/components/MessageForm";
 import { ShareButtons } from "@/components/ShareButtons";
 import type { Metadata } from "next";
+import { cache } from "react";
 
 const DEPTH_LABELS = ["Pitch", "Idée", "Limbe"] as const;
+
+const getPitch = cache(async (id: string) => {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("pitches")
+    .select("id, title, one_liner, kind, status, poc_url, deck_url, poc_description, author_id, parent_id, depth, created_at")
+    .eq("id", id)
+    .single();
+  return data;
+});
 
 export async function generateMetadata({
   params,
@@ -19,12 +31,7 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const supabase = await createClient();
-  const { data: pitch } = await supabase
-    .from("pitches")
-    .select("title, one_liner, kind")
-    .eq("id", id)
-    .single();
+  const pitch = await getPitch(id);
 
   if (!pitch) return { title: "Pitch introuvable" };
 
@@ -56,11 +63,7 @@ export default async function PitchDetailPage({
   const { id } = await params;
   const supabase = await createClient();
 
-  const { data: pitch } = await supabase
-    .from("pitches")
-    .select("id, title, one_liner, kind, status, poc_url, deck_url, poc_description, author_id, parent_id, depth, created_at")
-    .eq("id", id)
-    .single();
+  const pitch = await getPitch(id);
 
   if (!pitch) notFound();
 
@@ -69,7 +72,6 @@ export default async function PitchDetailPage({
   const hasValidations = pitch.status === "poc_submitted" || pitch.status === "validated" || pitch.status === "rejected";
 
   const [
-    user,
     { data: votes },
     { data: images },
     { data: author },
@@ -77,8 +79,8 @@ export default async function PitchDetailPage({
     { data: children },
     { data: archivedChildren },
     messagesResult,
+    user,
   ] = await Promise.all([
-    getUser(),
     supabase.from("votes").select("id, amount, voter_id").eq("pitch_id", id),
     supabase.from("poc_images").select("id, storage_path").eq("pitch_id", id),
     supabase.from("profiles").select("display_name").eq("id", pitch.author_id).single(),
@@ -90,6 +92,7 @@ export default async function PitchDetailPage({
     pitch.depth === 2
       ? supabase.from("messages").select("id, content, created_at, author_id").eq("pitch_id", id).order("created_at", { ascending: true })
       : Promise.resolve({ data: null }),
+    getUser(),
   ]);
 
   const isAuthor = user?.id === pitch.author_id;
@@ -288,9 +291,11 @@ export default async function PitchDetailPage({
             <div className="mb-6 grid grid-cols-2 gap-3">
               {imageUrls.map((url, i) => (
                 <a key={i} href={url} target="_blank" rel="noopener noreferrer">
-                  <img
+                  <Image
                     src={url}
                     alt={`Image ${i + 1}`}
+                    width={400}
+                    height={300}
                     className="rounded-xl border border-zinc-200 object-cover dark:border-zinc-800"
                   />
                 </a>
@@ -376,9 +381,11 @@ export default async function PitchDetailPage({
                 <div className="grid grid-cols-2 gap-3">
                   {imageUrls.map((url, i) => (
                     <a key={i} href={url} target="_blank" rel="noopener noreferrer">
-                      <img
+                      <Image
                         src={url}
                         alt={`Image ${i + 1}`}
+                        width={400}
+                        height={300}
                         className="rounded-xl border border-zinc-200 object-cover dark:border-zinc-800"
                       />
                     </a>

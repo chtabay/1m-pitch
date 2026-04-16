@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getUser } from "@/lib/supabase/server";
 import { notFound, redirect } from "next/navigation";
 import { updatePitch } from "@/app/actions/pitches";
 import Link from "next/link";
@@ -11,18 +11,16 @@ export default async function EditPitchPage({
   const { id } = await params;
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const [user, { data: pitch }] = await Promise.all([
+    getUser(),
+    supabase
+      .from("pitches")
+      .select("id, title, one_liner, kind, author_id")
+      .eq("id", id)
+      .single(),
+  ]);
 
   if (!user) redirect("/");
-
-  const { data: pitch } = await supabase
-    .from("pitches")
-    .select("id, title, one_liner, kind, author_id")
-    .eq("id", id)
-    .single();
-
   if (!pitch || pitch.author_id !== user.id) notFound();
 
   const updateWithId = updatePitch.bind(null, pitch.id);

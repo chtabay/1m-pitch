@@ -32,3 +32,13 @@ export const getUser = cache(async () => {
   const { data: { user } } = await supabase.auth.getUser();
   return user;
 });
+
+export const getUserBalance = cache(async (userId: string) => {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("profiles")
+    .select("balance")
+    .eq("id", userId)
+    .single();
+  return data?.balance ?? 0;
+});

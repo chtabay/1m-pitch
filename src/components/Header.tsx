@@ -1,20 +1,11 @@
 import Link from "next/link";
-import { createClient, getUser } from "@/lib/supabase/server";
+import { getUser, getUserBalance } from "@/lib/supabase/server";
 import { AuthButton } from "./AuthButton";
 import { formatUSD } from "@/lib/format";
 
 export async function Header() {
-  const [user, supabase] = await Promise.all([getUser(), createClient()]);
-
-  let balance = 0;
-  if (user) {
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("balance")
-      .eq("id", user.id)
-      .single();
-    balance = profile?.balance ?? 0;
-  }
+  const user = await getUser();
+  const balance = user ? await getUserBalance(user.id) : 0;
 
   return (
     <header className="sticky top-0 z-50 border-b-2 border-ink bg-card/90 backdrop-blur">

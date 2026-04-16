@@ -1,8 +1,9 @@
-import { createClient, getUser } from "@/lib/supabase/server";
+import { createClient, getUser, getUserBalance } from "@/lib/supabase/server";
 import { PitchCard } from "@/components/PitchCard";
 import { SearchBar } from "@/components/SearchBar";
 import { InfoButton } from "@/components/InfoButton";
 import Link from "next/link";
+import { Suspense } from "react";
 
 export const revalidate = 30;
 
@@ -58,7 +59,7 @@ export default async function Home({
 
   const authorIds = [...new Set((pitches ?? []).map((p) => p.author_id))];
 
-  const [profilesResult, votesResult, balanceResult] = await Promise.all([
+  const [profilesResult, votesResult, userBalance] = await Promise.all([
     supabase
       .from("profiles")
       .select("id, display_name")
@@ -66,9 +67,7 @@ export default async function Home({
     user
       ? supabase.from("votes").select("pitch_id").eq("voter_id", user.id)
       : null,
-    user
-      ? supabase.from("profiles").select("balance").eq("id", user.id).single()
-      : null,
+    user ? getUserBalance(user.id) : 0,
   ]);
 
   const profileMap = new Map(
@@ -78,7 +77,6 @@ export default async function Home({
   const userVotes = new Set(
     (votesResult?.data ?? []).map((v) => v.pitch_id),
   );
-  const userBalance = balanceResult?.data?.balance ?? 0;
 
   const activeKind = kind ?? "all";
 
@@ -108,7 +106,9 @@ export default async function Home({
       </section>
 
       <div className="mb-4 flex justify-center">
-        <SearchBar defaultValue={searchTerm} />
+        <Suspense fallback={<div className="h-10 w-full max-w-md animate-pulse rounded-full bg-zinc-200 dark:bg-zinc-800" />}>
+          <SearchBar defaultValue={searchTerm} />
+        </Suspense>
       </div>
 
       <div className="mb-8 flex flex-wrap items-center justify-center gap-2">

@@ -6,6 +6,18 @@ const nextConfig: NextConfig = {
       dynamic: 30,
     },
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "**.supabase.co",
+      },
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
+      },
+    ],
+  },
 };
 
 export default nextConfig;
