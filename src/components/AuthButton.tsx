@@ -92,48 +92,51 @@ export function AuthButton({ user }: Props) {
   }
 
   return (
-    <form onSubmit={handleEmailAuth} className="flex flex-col gap-2 rounded-xl border-2 border-ink bg-card p-4 shadow-[4px_4px_0_0_theme(colors.ink)]">
-      <div className="flex items-center justify-between">
+    <div className="relative">
+      <button onClick={() => { setMode("idle"); setError(""); setInfo(""); }} className={BTN}>
+        ✕
+      </button>
+      <form
+        onSubmit={handleEmailAuth}
+        className="absolute right-0 top-full mt-2 z-50 flex w-72 flex-col gap-2 rounded-xl border-2 border-ink bg-card p-4 shadow-[4px_4px_0_0_theme(colors.ink)]"
+      >
         <span className="font-serif text-sm font-bold">
           {isSignUp ? "Créer un compte" : "Se connecter"}
         </span>
-        <button type="button" onClick={() => { setMode("idle"); setError(""); setInfo(""); }} className="text-xs text-muted hover:text-foreground">
-          ✕
+
+        <input
+          type="email"
+          placeholder="email@exemple.com"
+          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="rounded-lg border border-ink bg-background px-3 py-1.5 text-sm outline-none focus:border-accent"
+        />
+        <input
+          type="password"
+          placeholder="Mot de passe (6 car. min)"
+          required
+          minLength={6}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="rounded-lg border border-ink bg-background px-3 py-1.5 text-sm outline-none focus:border-accent"
+        />
+
+        {error && <p className="text-xs text-red-600">{error}</p>}
+        {info && <p className="text-xs text-emerald-600">{info}</p>}
+
+        <button type="submit" disabled={loading} className={`${BTN} bg-accent text-zinc-900 disabled:opacity-50`}>
+          {loading ? "..." : isSignUp ? "Créer" : "Connexion"}
         </button>
-      </div>
 
-      <input
-        type="email"
-        placeholder="email@exemple.com"
-        required
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        className="rounded-lg border border-ink bg-background px-3 py-1.5 text-sm outline-none focus:border-accent"
-      />
-      <input
-        type="password"
-        placeholder="Mot de passe (6 car. min)"
-        required
-        minLength={6}
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        className="rounded-lg border border-ink bg-background px-3 py-1.5 text-sm outline-none focus:border-accent"
-      />
-
-      {error && <p className="text-xs text-red-600">{error}</p>}
-      {info && <p className="text-xs text-emerald-600">{info}</p>}
-
-      <button type="submit" disabled={loading} className={`${BTN} bg-accent text-zinc-900 disabled:opacity-50`}>
-        {loading ? "..." : isSignUp ? "Créer" : "Connexion"}
-      </button>
-
-      <button
-        type="button"
-        onClick={() => { setIsSignUp(!isSignUp); setError(""); setInfo(""); }}
-        className="text-xs text-muted underline hover:text-foreground"
-      >
-        {isSignUp ? "Déjà un compte ? Se connecter" : "Pas de compte ? Créer"}
-      </button>
-    </form>
+        <button
+          type="button"
+          onClick={() => { setIsSignUp(!isSignUp); setError(""); setInfo(""); }}
+          className="text-xs text-muted underline hover:text-foreground"
+        >
+          {isSignUp ? "Déjà un compte ? Se connecter" : "Pas de compte ? Créer"}
+        </button>
+      </form>
+    </div>
   );
 }
