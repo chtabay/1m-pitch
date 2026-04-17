@@ -245,79 +245,92 @@ export default async function PitchDetailPage({
 
       {/* === Depth 0: formal deliverable workflow === */}
       {pitch.depth === 0 && (pitch.status === "open" || pitch.status === "rejected") && isAuthor && (
-        <section className="mb-10 rounded-2xl border border-dashed border-zinc-300 p-6 dark:border-zinc-700">
-          <h2 className="mb-4 text-lg font-bold">
-            {pitch.status === "rejected" ? "Resoumettre le livrable" : "Soumettre le livrable"}
-          </h2>
+        <section className="mb-10 rounded-2xl border-2 border-ink bg-card p-6 shadow-[6px_6px_0_0_theme(colors.ink)]">
+          <div className="-mx-6 -mt-6 mb-6 rounded-t-2xl bg-accent px-6 py-3 border-b-2 border-ink">
+            <h2 className="font-serif text-xl font-black text-zinc-900">
+              {pitch.status === "rejected" ? "↻ Resoumettre le livrable" : "✦ Soumettre le livrable"}
+            </h2>
+          </div>
           <PocSubmitForm pitchId={pitch.id} />
         </section>
       )}
 
       {pitch.depth === 0 && pitch.status !== "open" && (
-        <section className="mb-10 rounded-2xl border border-zinc-200 bg-zinc-50 p-6 dark:border-zinc-800 dark:bg-zinc-900/50">
-          <h2 className="mb-4 text-lg font-bold">Ressources</h2>
-
-          <div className="mb-4 flex flex-wrap gap-3">
-            {pitch.poc_url && (
-              <a
-                href={pitch.poc_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white shadow-[0_3px_0_0_theme(colors.emerald.800)] transition-all hover:-translate-y-0.5 hover:shadow-[0_5px_0_0_theme(colors.emerald.800)] active:translate-y-0 active:shadow-[0_0px_0_0_theme(colors.emerald.800)] dark:bg-emerald-700 dark:shadow-[0_3px_0_0_theme(colors.emerald.950)]"
-              >
-                📄 Livrable
-                <span className="text-emerald-200">↗</span>
-              </a>
-            )}
-
-            {pitch.deck_url && (
-              <a
-                href={pitch.deck_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-[0_3px_0_0_theme(colors.indigo.800)] transition-all hover:-translate-y-0.5 hover:shadow-[0_5px_0_0_theme(colors.indigo.800)] active:translate-y-0 active:shadow-[0_0px_0_0_theme(colors.indigo.800)] dark:bg-indigo-700 dark:shadow-[0_3px_0_0_theme(colors.indigo.950)]"
-              >
-                📊 Deck
-                <span className="text-indigo-200">↗</span>
-              </a>
+        <section className="mb-10 rounded-2xl border-2 border-ink bg-card shadow-[6px_6px_0_0_theme(colors.ink)] overflow-hidden">
+          <div className="flex items-center justify-between bg-accent px-6 py-3 border-b-2 border-ink">
+            <h2 className="font-serif text-xl font-black text-zinc-900">
+              📦 Livrables
+            </h2>
+            {pitch.status === "poc_submitted" && (
+              <span className="text-xs font-semibold text-zinc-900 uppercase tracking-wide">
+                {approvalCount} ✓ · {rejectionCount} ✗ / {investorCount}
+              </span>
             )}
           </div>
 
-          {pitch.poc_description && (
-            <p className="mb-4 text-sm text-muted">{pitch.poc_description}</p>
-          )}
+          <div className="p-6">
+            {(pitch.poc_url || pitch.deck_url) && (
+              <div className="mb-5 flex flex-wrap gap-3">
+                {pitch.poc_url && (
+                  <a
+                    href={pitch.poc_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white shadow-[0_3px_0_0_theme(colors.emerald.800)] transition-all hover:-translate-y-0.5 hover:shadow-[0_5px_0_0_theme(colors.emerald.800)] active:translate-y-0 active:shadow-[0_0px_0_0_theme(colors.emerald.800)] dark:bg-emerald-700 dark:shadow-[0_3px_0_0_theme(colors.emerald.950)]"
+                  >
+                    📄 Livrable
+                    <span className="text-emerald-200">↗</span>
+                  </a>
+                )}
 
-          {imageUrls.length > 0 && (
-            <div className="mb-6 grid grid-cols-2 gap-3">
-              {imageUrls.map((url, i) => (
-                <a key={i} href={url} target="_blank" rel="noopener noreferrer">
-                  <Image
-                    src={url}
-                    alt={`Image ${i + 1}`}
-                    width={400}
-                    height={300}
-                    className="rounded-xl border border-zinc-200 object-cover dark:border-zinc-800"
-                  />
-                </a>
-              ))}
-            </div>
-          )}
-
-          {pitch.status === "poc_submitted" && (
-            <div className="rounded-xl border border-zinc-200 p-4 dark:border-zinc-800">
-              <div className="mb-3 flex items-center justify-between text-sm">
-                <span className="text-muted">
-                  Validation : {approvalCount} ✓ · {rejectionCount} ✗ / {investorCount}
-                </span>
+                {pitch.deck_url && (
+                  <a
+                    href={pitch.deck_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-[0_3px_0_0_theme(colors.indigo.800)] transition-all hover:-translate-y-0.5 hover:shadow-[0_5px_0_0_theme(colors.indigo.800)] active:translate-y-0 active:shadow-[0_0px_0_0_theme(colors.indigo.800)] dark:bg-indigo-700 dark:shadow-[0_3px_0_0_theme(colors.indigo.950)]"
+                  >
+                    📊 Deck
+                    <span className="text-indigo-200">↗</span>
+                  </a>
+                )}
               </div>
-              {isInvestor && (
+            )}
+
+            {pitch.poc_description && (
+              <p className="mb-5 text-base leading-relaxed border-l-4 border-ink/20 pl-4 italic">
+                {pitch.poc_description}
+              </p>
+            )}
+
+            {imageUrls.length > 0 && (
+              <div className="mb-5 grid grid-cols-2 gap-3">
+                {imageUrls.map((url, i) => (
+                  <a key={i} href={url} target="_blank" rel="noopener noreferrer">
+                    <Image
+                      src={url}
+                      alt={`Image ${i + 1}`}
+                      width={400}
+                      height={300}
+                      className="rounded-xl border-2 border-ink object-cover"
+                    />
+                  </a>
+                ))}
+              </div>
+            )}
+
+            {pitch.status === "poc_submitted" && isInvestor && (
+              <div className="mt-4 rounded-xl border-2 border-ink bg-background p-4">
+                <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted">
+                  Votre validation
+                </p>
                 <PocValidateButton
                   pitchId={pitch.id}
                   currentVote={userValidation}
                 />
-              )}
-            </div>
-          )}
+              </div>
+            )}
+          </div>
         </section>
       )}
 
@@ -347,9 +360,11 @@ export default async function PitchDetailPage({
 
       {/* === Depth > 0: optional resources (no status change) === */}
       {pitch.depth > 0 && (
-        <section className="mb-10">
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-lg font-bold">Ressources</h2>
+        <section className="mb-10 rounded-2xl border-2 border-ink bg-card shadow-[6px_6px_0_0_theme(colors.ink)] overflow-hidden">
+          <div className="flex items-center justify-between bg-accent px-6 py-3 border-b-2 border-ink">
+            <h2 className="font-serif text-xl font-black text-zinc-900">
+              📦 Ressources
+            </h2>
             {isAuthor && (
               <ResourceForm
                 pitchId={pitch.id}
@@ -359,43 +374,47 @@ export default async function PitchDetailPage({
             )}
           </div>
 
-          {(pitch.poc_url || pitch.poc_description || imageUrls.length > 0) ? (
-            <div>
-              {pitch.poc_url && (
-                <a
-                  href={pitch.poc_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mb-4 inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white shadow-[0_3px_0_0_theme(colors.emerald.800)] transition-all hover:-translate-y-0.5 hover:shadow-[0_5px_0_0_theme(colors.emerald.800)] active:translate-y-0 active:shadow-[0_0px_0_0_theme(colors.emerald.800)] dark:bg-emerald-700 dark:shadow-[0_3px_0_0_theme(colors.emerald.950)]"
-                >
-                  📄 Voir la ressource
-                  <span className="text-emerald-200">↗</span>
-                </a>
-              )}
+          <div className="p-6">
+            {(pitch.poc_url || pitch.poc_description || imageUrls.length > 0) ? (
+              <>
+                {pitch.poc_url && (
+                  <a
+                    href={pitch.poc_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mb-5 inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white shadow-[0_3px_0_0_theme(colors.emerald.800)] transition-all hover:-translate-y-0.5 hover:shadow-[0_5px_0_0_theme(colors.emerald.800)] active:translate-y-0 active:shadow-[0_0px_0_0_theme(colors.emerald.800)] dark:bg-emerald-700 dark:shadow-[0_3px_0_0_theme(colors.emerald.950)]"
+                  >
+                    📄 Voir la ressource
+                    <span className="text-emerald-200">↗</span>
+                  </a>
+                )}
 
-              {pitch.poc_description && (
-                <p className="mb-4 text-sm text-muted">{pitch.poc_description}</p>
-              )}
+                {pitch.poc_description && (
+                  <p className="mb-5 text-base leading-relaxed border-l-4 border-ink/20 pl-4 italic">
+                    {pitch.poc_description}
+                  </p>
+                )}
 
-              {imageUrls.length > 0 && (
-                <div className="grid grid-cols-2 gap-3">
-                  {imageUrls.map((url, i) => (
-                    <a key={i} href={url} target="_blank" rel="noopener noreferrer">
-                      <Image
-                        src={url}
-                        alt={`Image ${i + 1}`}
-                        width={400}
-                        height={300}
-                        className="rounded-xl border border-zinc-200 object-cover dark:border-zinc-800"
-                      />
-                    </a>
-                  ))}
-                </div>
-              )}
-            </div>
-          ) : (
-            <p className="text-sm text-muted italic">Aucune ressource.</p>
-          )}
+                {imageUrls.length > 0 && (
+                  <div className="grid grid-cols-2 gap-3">
+                    {imageUrls.map((url, i) => (
+                      <a key={i} href={url} target="_blank" rel="noopener noreferrer">
+                        <Image
+                          src={url}
+                          alt={`Image ${i + 1}`}
+                          width={400}
+                          height={300}
+                          className="rounded-xl border-2 border-ink object-cover"
+                        />
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </>
+            ) : (
+              <p className="text-sm text-muted italic">Aucune ressource.</p>
+            )}
+          </div>
         </section>
       )}
 
