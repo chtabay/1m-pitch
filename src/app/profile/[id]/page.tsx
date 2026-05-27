@@ -44,7 +44,9 @@ export default async function ProfilePage({
     0,
   );
 
-  const fundedPitches = (pitches ?? []).filter((p) => p.potential_usd > 0);
+  const activePitches = (pitches ?? []).filter((p) => !p.archived_at);
+  const archivedPitches = (pitches ?? []).filter((p) => p.archived_at);
+  const fundedPitches = activePitches.filter((p) => p.potential_usd > 0);
 
   const validatedPitchIds = (investedPitches ?? [])
     .filter((p) => p.status === "validated")
@@ -178,6 +180,35 @@ export default async function ProfilePage({
               </Link>
             ))}
           </div>
+        </section>
+      )}
+
+      {isOwner && archivedPitches.length > 0 && (
+        <section className="mb-10">
+          <details>
+            <summary className="cursor-pointer text-sm font-medium text-muted hover:text-foreground">
+              🗄 Archives ({archivedPitches.length})
+            </summary>
+            <div className="mt-3 space-y-3">
+              {archivedPitches.map((p) => (
+                <Link
+                  key={p.pitch_id}
+                  href={`/pitch/${p.pitch_id}`}
+                  className="flex items-center justify-between rounded-xl border border-zinc-200 p-4 opacity-60 transition hover:opacity-100 dark:border-zinc-800"
+                >
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold truncate">{p.title}</p>
+                    <p className="text-xs text-muted truncate">{p.one_liner}</p>
+                  </div>
+                  {p.potential_usd > 0 && (
+                    <span className="ml-3 font-mono text-sm font-semibold text-accent">
+                      {formatUSD(p.potential_usd)}
+                    </span>
+                  )}
+                </Link>
+              ))}
+            </div>
+          </details>
         </section>
       )}
 

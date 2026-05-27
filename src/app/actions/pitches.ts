@@ -403,3 +403,30 @@ export async function postMessage(pitchId: string, formData: FormData) {
 
   revalidatePath(`/pitch/${pitchId}`);
 }
+
+export async function archivePitch(pitchId: string) {
+  await setArchived(pitchId, new Date().toISOString());
+}
+
+export async function unarchivePitch(pitchId: string) {
+  await setArchived(pitchId, null);
+}
+
+async function setArchived(pitchId: string, archivedAt: string | null) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return;
+
+  await supabase
+    .from("pitches")
+    .update({ archived_at: archivedAt })
+    .eq("id", pitchId)
+    .eq("author_id", user.id);
+
+  revalidatePath("/");
+  revalidatePath(`/pitch/${pitchId}`);
+  revalidatePath(`/profile/${user.id}`);
+}

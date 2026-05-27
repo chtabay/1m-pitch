@@ -36,7 +36,12 @@ export default async function Home({
   const activeSort: SortKey =
     sort === "recent" || sort === "trending" ? sort : "funded";
 
-  let query = supabase.from("pitch_stats").select("*").eq("depth", 0).limit(50);
+  let query = supabase
+    .from("pitch_stats")
+    .select("*")
+    .eq("depth", 0)
+    .is("archived_at", null)
+    .limit(50);
 
   if (kind === "film" || kind === "concept" || kind === "jeu" || kind === "logiciel") {
     query = query.eq("kind", kind);

@@ -10,6 +10,7 @@ import { StatusBadge } from "@/components/StatusBadge";
 import { NewIdeaForm } from "@/components/NewIdeaForm";
 import { MessageForm } from "@/components/MessageForm";
 import { ShareButtons } from "@/components/ShareButtons";
+import { ArchiveButton } from "@/components/ArchiveButton";
 import type { Metadata } from "next";
 import { cache } from "react";
 
@@ -19,7 +20,7 @@ const getPitch = cache(async (id: string) => {
   const supabase = await createClient();
   const { data } = await supabase
     .from("pitches")
-    .select("id, title, one_liner, kind, status, poc_url, deck_url, poc_description, author_id, parent_id, depth, created_at")
+    .select("id, title, one_liner, kind, status, poc_url, deck_url, poc_description, author_id, parent_id, depth, created_at, archived_at")
     .eq("id", id)
     .single();
   return data;
@@ -87,8 +88,8 @@ export default async function PitchDetailPage({
     hasValidations
       ? supabase.from("poc_validations").select("voter_id, approved").eq("pitch_id", id)
       : Promise.resolve({ data: null }),
-    supabase.from("pitch_stats").select("*").eq("parent_id", id).neq("status", "rejected").order("potential_usd", { ascending: false }),
-    supabase.from("pitch_stats").select("*").eq("parent_id", id).eq("status", "rejected").order("created_at", { ascending: false }),
+    supabase.from("pitch_stats").select("*").eq("parent_id", id).neq("status", "rejected").is("archived_at", null).order("potential_usd", { ascending: false }),
+    supabase.from("pitch_stats").select("*").eq("parent_id", id).or("status.eq.rejected,archived_at.not.is.null").order("created_at", { ascending: false }),
     pitch.depth === 2
       ? supabase.from("messages").select("id, content, created_at, author_id").eq("pitch_id", id).order("created_at", { ascending: true })
       : Promise.resolve({ data: null }),
@@ -169,6 +170,15 @@ export default async function PitchDetailPage({
         {backLabel}
       </Link>
 
+      {pitch.archived_at && (
+        <div className="mb-6 flex items-center justify-between rounded-xl border-2 border-ink bg-zinc-100 px-4 py-3 dark:bg-zinc-800">
+          <span className="text-sm font-semibold">
+            🗄 Archivée — masquée de l&apos;accueil
+          </span>
+          {isAuthor && <ArchiveButton pitchId={pitch.id} archived={true} />}
+        </div>
+      )}
+
       <div className="mb-4 flex items-center gap-3">
         <span className="rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs font-semibold text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
           {depthLabel}
@@ -193,9 +203,23 @@ export default async function PitchDetailPage({
       <h1 className="mb-2 text-3xl font-extrabold tracking-tight">
         {pitch.title}
       </h1>
-      <p className="mb-6 text-lg text-muted leading-relaxed">
+      <p className="mb-4 text-lg text-muted leading-relaxed">
         {pitch.one_liner}
       </p>
+
+      {isAuthor && !pitch.archived_at && (
+        <div className="mb-6 flex flex-wrap gap-2">
+          {pitch.depth === 0 && pitch.status === "open" && (
+            <Link
+              href={`/pitch/${pitch.id}/edit`}
+              className="rounded-lg border-2 border-ink bg-card px-3 py-1.5 text-xs font-semibold shadow-[2px_2px_0_0_theme(colors.ink)] transition-all hover:-translate-y-0.5 hover:shadow-[3px_3px_0_0_theme(colors.ink)] active:translate-y-0 active:shadow-none"
+            >
+              ✎ Éditer
+            </Link>
+          )}
+          <ArchiveButton pitchId={pitch.id} archived={false} />
+        </div>
+      )}
 
       <div className="mb-8">
         <div className="flex items-center justify-between text-sm mb-2">
