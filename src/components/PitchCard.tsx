@@ -27,10 +27,10 @@ type Props = {
 };
 
 const KIND_COLORS: Record<string, string> = {
-  film: "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300",
-  jeu: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300",
-  logiciel: "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300",
-  concept: "bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300",
+  film: "bg-blue-50 text-blue-900 dark:bg-blue-950/60 dark:text-blue-200",
+  jeu: "bg-emerald-50 text-emerald-900 dark:bg-emerald-950/60 dark:text-emerald-200",
+  logiciel: "bg-amber-50 text-amber-900 dark:bg-amber-950/60 dark:text-amber-200",
+  concept: "bg-purple-50 text-purple-900 dark:bg-purple-950/60 dark:text-purple-200",
 };
 
 export function PitchCard({
