@@ -11,6 +11,8 @@ import { NewIdeaForm } from "@/components/NewIdeaForm";
 import { MessageForm } from "@/components/MessageForm";
 import { ShareButtons } from "@/components/ShareButtons";
 import { ArchiveButton } from "@/components/ArchiveButton";
+import { PocEditForm } from "@/components/PocEditForm";
+import { PocImageDeleteButton } from "@/components/PocImageDeleteButton";
 import type { Metadata } from "next";
 import { cache } from "react";
 
@@ -124,10 +126,11 @@ export default async function PitchDetailPage({
     amount: v.amount,
   })).sort((a, b) => b.amount - a.amount);
 
-  const imageUrls = (images ?? []).map((img) => {
+  const pocImages = (images ?? []).map((img) => {
     const { data } = supabase.storage.from("poc-images").getPublicUrl(img.storage_path);
-    return data.publicUrl;
+    return { id: img.id, url: data.publicUrl };
   });
+  const canEditDeliverable = isAuthor && pitch.status === "poc_submitted";
 
   let userValidation: boolean | null = null;
   let approvalCount = 0;
@@ -281,15 +284,25 @@ export default async function PitchDetailPage({
 
       {pitch.depth === 0 && pitch.status !== "open" && (
         <section className="mb-10 rounded-2xl border-2 border-ink bg-card shadow-[6px_6px_0_0_theme(colors.ink)] overflow-hidden">
-          <div className="flex items-center justify-between bg-accent px-6 py-3 border-b-2 border-ink">
+          <div className="flex items-center justify-between gap-3 bg-accent px-6 py-3 border-b-2 border-ink">
             <h2 className="font-serif text-xl font-black text-zinc-900">
               📦 Livrables
             </h2>
-            {pitch.status === "poc_submitted" && (
-              <span className="text-xs font-semibold text-zinc-900 uppercase tracking-wide">
-                {approvalCount} ✓ · {rejectionCount} ✗ / {investorCount}
-              </span>
-            )}
+            <div className="flex items-center gap-3">
+              {pitch.status === "poc_submitted" && (
+                <span className="text-xs font-semibold text-zinc-900 uppercase tracking-wide">
+                  {approvalCount} ✓ · {rejectionCount} ✗ / {investorCount}
+                </span>
+              )}
+              {canEditDeliverable && (
+                <PocEditForm
+                  pitchId={pitch.id}
+                  currentUrl={pitch.poc_url}
+                  currentDeckUrl={pitch.deck_url}
+                  currentDescription={pitch.poc_description}
+                />
+              )}
+            </div>
           </div>
 
           <div className="p-6">
@@ -327,18 +340,23 @@ export default async function PitchDetailPage({
               </p>
             )}
 
-            {imageUrls.length > 0 && (
+            {pocImages.length > 0 && (
               <div className="mb-5 grid grid-cols-2 gap-3">
-                {imageUrls.map((url, i) => (
-                  <a key={i} href={url} target="_blank" rel="noopener noreferrer">
-                    <Image
-                      src={url}
-                      alt={`Image ${i + 1}`}
-                      width={400}
-                      height={300}
-                      className="rounded-xl border-2 border-ink object-cover"
-                    />
-                  </a>
+                {pocImages.map((img, i) => (
+                  <div key={img.id} className="relative">
+                    <a href={img.url} target="_blank" rel="noopener noreferrer">
+                      <Image
+                        src={img.url}
+                        alt={`Image ${i + 1}`}
+                        width={400}
+                        height={300}
+                        className="rounded-xl border-2 border-ink object-cover"
+                      />
+                    </a>
+                    {canEditDeliverable && (
+                      <PocImageDeleteButton imageId={img.id} pitchId={pitch.id} />
+                    )}
+                  </div>
                 ))}
               </div>
             )}
@@ -399,7 +417,7 @@ export default async function PitchDetailPage({
           </div>
 
           <div className="p-6">
-            {(pitch.poc_url || pitch.poc_description || imageUrls.length > 0) ? (
+            {(pitch.poc_url || pitch.poc_description || pocImages.length > 0) ? (
               <>
                 {pitch.poc_url && (
                   <a
@@ -419,12 +437,12 @@ export default async function PitchDetailPage({
                   </p>
                 )}
 
-                {imageUrls.length > 0 && (
+                {pocImages.length > 0 && (
                   <div className="grid grid-cols-2 gap-3">
-                    {imageUrls.map((url, i) => (
-                      <a key={i} href={url} target="_blank" rel="noopener noreferrer">
+                    {pocImages.map((img, i) => (
+                      <a key={img.id} href={img.url} target="_blank" rel="noopener noreferrer">
                         <Image
-                          src={url}
+                          src={img.url}
                           alt={`Image ${i + 1}`}
                           width={400}
                           height={300}

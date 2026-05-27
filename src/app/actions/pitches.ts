@@ -404,6 +404,90 @@ export async function postMessage(pitchId: string, formData: FormData) {
   revalidatePath(`/pitch/${pitchId}`);
 }
 
+export async function editPoc(pitchId: string, formData: FormData) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return;
+
+  const { data: pitch } = await supabase
+    .from("pitches")
+    .select("id, author_id, status")
+    .eq("id", pitchId)
+    .single();
+
+  if (!pitch || pitch.author_id !== user.id) return;
+  if (pitch.status !== "poc_submitted") return;
+
+  const pocUrl = (formData.get("poc_url") as string)?.trim() || null;
+  const deckUrl = (formData.get("deck_url") as string)?.trim() || null;
+  const pocDescription = (formData.get("poc_description") as string)?.trim() || null;
+
+  const files = formData.getAll("images") as File[];
+  const validFiles = files.filter((f) => f.size > 0 && f.size < 5_000_000);
+
+  for (const file of validFiles) {
+    const ext = file.name.split(".").pop() ?? "jpg";
+    const path = `${pitchId}/${crypto.randomUUID()}.${ext}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("poc-images")
+      .upload(path, file, { contentType: file.type });
+
+    if (!uploadError) {
+      await supabase
+        .from("poc_images")
+        .insert({ pitch_id: pitchId, storage_path: path });
+    }
+  }
+
+  await supabase
+    .from("pitches")
+    .update({
+      poc_url: pocUrl,
+      deck_url: deckUrl,
+      poc_description: pocDescription,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", pitchId);
+
+  revalidatePath(`/pitch/${pitchId}`);
+}
+
+export async function deletePocImage(imageId: string, pitchId: string) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return;
+
+  const { data: pitch } = await supabase
+    .from("pitches")
+    .select("author_id, status")
+    .eq("id", pitchId)
+    .single();
+
+  if (!pitch || pitch.author_id !== user.id) return;
+  if (pitch.status !== "poc_submitted") return;
+
+  const { data: image } = await supabase
+    .from("poc_images")
+    .select("storage_path")
+    .eq("id", imageId)
+    .eq("pitch_id", pitchId)
+    .single();
+
+  if (!image) return;
+
+  await supabase.storage.from("poc-images").remove([image.storage_path]);
+  await supabase.from("poc_images").delete().eq("id", imageId);
+
+  revalidatePath(`/pitch/${pitchId}`);
+}
+
 export async function archivePitch(pitchId: string) {
   await setArchived(pitchId, new Date().toISOString());
 }
