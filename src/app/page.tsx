@@ -34,7 +34,7 @@ export default async function Home({
   const [supabase, user] = await Promise.all([createClient(), getUser()]);
 
   const activeSort: SortKey =
-    sort === "recent" || sort === "trending" ? sort : "funded";
+    sort === "funded" || sort === "trending" ? sort : "recent";
 
   let query = supabase
     .from("pitch_stats")
@@ -54,10 +54,10 @@ export default async function Home({
     );
   }
 
-  if (activeSort === "recent") {
-    query = query.order("created_at", { ascending: false });
-  } else {
+  if (activeSort === "funded") {
     query = query.order("potential_usd", { ascending: false });
+  } else {
+    query = query.order("created_at", { ascending: false });
   }
 
   const { data: pitches } = await query;
@@ -90,7 +90,7 @@ export default async function Home({
     const k = params.kind ?? kind;
     const s = params.sort ?? sort;
     if (k && k !== "all") p.set("kind", k);
-    if (s && s !== "funded") p.set("sort", s);
+    if (s && s !== "recent") p.set("sort", s);
     if (searchTerm) p.set("q", searchTerm);
     const qs = p.toString();
     return qs ? `/?${qs}` : "/";
