@@ -1,7 +1,9 @@
 "use client";
 
 import { submitPoc } from "@/app/actions/pitches";
-import { useTransition, useRef } from "react";
+import { useTransition, useRef, useState } from "react";
+
+const MAX_FILE_SIZE = 5_000_000;
 
 type Props = {
   pitchId: string;
@@ -9,9 +11,17 @@ type Props = {
 
 export function PocSubmitForm({ pitchId }: Props) {
   const [pending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
   const handleSubmit = (formData: FormData) => {
+    const files = formData.getAll("images") as File[];
+    const oversized = files.find((f) => f.size > MAX_FILE_SIZE);
+    if (oversized) {
+      setError(`"${oversized.name}" dépasse 5 Mo. Compresse-la avant l'envoi.`);
+      return;
+    }
+    setError(null);
     startTransition(() => submitPoc(pitchId, formData));
   };
 
@@ -70,6 +80,12 @@ export function PocSubmitForm({ pitchId }: Props) {
           className="w-full text-sm text-muted file:mr-3 file:rounded-lg file:border-2 file:border-ink file:bg-background file:px-3 file:py-1.5 file:text-sm file:font-semibold"
         />
       </div>
+
+      {error && (
+        <p className="rounded-lg border-2 border-red-500 bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950/40 dark:text-red-300">
+          ⚠ {error}
+        </p>
+      )}
 
       <button
         type="submit"

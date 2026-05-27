@@ -3,6 +3,8 @@
 import { updateResources } from "@/app/actions/pitches";
 import { useState, useTransition } from "react";
 
+const MAX_FILE_SIZE = 5_000_000;
+
 type Props = {
   pitchId: string;
   currentUrl?: string | null;
@@ -15,8 +17,16 @@ const BTN_3D =
 export function ResourceForm({ pitchId, currentUrl, currentDescription }: Props) {
   const [pending, startTransition] = useTransition();
   const [open, setOpen] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = (formData: FormData) => {
+    const files = formData.getAll("images") as File[];
+    const oversized = files.find((f) => f.size > MAX_FILE_SIZE);
+    if (oversized) {
+      setError(`"${oversized.name}" dépasse 5 Mo.`);
+      return;
+    }
+    setError(null);
     startTransition(() => {
       updateResources(pitchId, formData);
       setOpen(false);
@@ -104,6 +114,12 @@ export function ResourceForm({ pitchId, currentUrl, currentDescription }: Props)
             className="w-full text-sm text-muted file:mr-3 file:rounded-lg file:border-2 file:border-ink file:bg-background file:px-3 file:py-1.5 file:text-sm file:font-semibold"
           />
         </div>
+
+        {error && (
+          <p className="rounded-lg border-2 border-red-500 bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950/40 dark:text-red-300">
+            ⚠ {error}
+          </p>
+        )}
 
         <div className="flex gap-2">
           <button
