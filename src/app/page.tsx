@@ -62,9 +62,10 @@ export default async function Home({
 
   const { data: pitches } = await query;
 
+  const pitchIds = (pitches ?? []).map((p) => p.pitch_id);
   const authorIds = [...new Set((pitches ?? []).map((p) => p.author_id))];
 
-  const [profilesResult, votesResult, userBalance] = await Promise.all([
+  const [profilesResult, votesResult, userBalance, imagesResult] = await Promise.all([
     supabase
       .from("profiles")
       .select("id, display_name")
@@ -73,6 +74,12 @@ export default async function Home({
       ? supabase.from("votes").select("pitch_id").eq("voter_id", user.id)
       : null,
     user ? getUserBalance(user.id) : 0,
+    pitchIds.length > 0
+      ? supabase
+          .from("poc_images")
+          .select("pitch_id, storage_path")
+          .in("pitch_id", pitchIds)
+      : null,
   ]);
 
   const profileMap = new Map(
@@ -82,6 +89,13 @@ export default async function Home({
   const userVotes = new Set(
     (votesResult?.data ?? []).map((v) => v.pitch_id),
   );
+
+  const thumbnailMap = new Map<string, string>();
+  for (const img of imagesResult?.data ?? []) {
+    if (thumbnailMap.has(img.pitch_id)) continue;
+    const { data } = supabase.storage.from("poc-images").getPublicUrl(img.storage_path);
+    thumbnailMap.set(img.pitch_id, data.publicUrl);
+  }
 
   const activeKind = kind ?? "all";
 
@@ -158,7 +172,7 @@ export default async function Home({
           <p className="text-lg italic">Silence.</p>
         </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {(pitches as PitchStat[]).map((pitch) => (
             <PitchCard
               key={pitch.pitch_id}
@@ -168,6 +182,7 @@ export default async function Home({
               isLoggedIn={!!user}
               userBalance={userBalance}
               isOwner={user?.id === pitch.author_id}
+              thumbnailUrl={thumbnailMap.get(pitch.pitch_id) ?? null}
             />
           ))}
         </div>
