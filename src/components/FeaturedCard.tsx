@@ -27,21 +27,19 @@ export function FeaturedCard({ pitch, authorName, hasVoted, isLoggedIn, userBala
   return (
     <article className="card" style={{ overflow: "hidden" }}>
       <div className="feat-grid">
-        <div style={{ borderBottom: "1.5px solid var(--ink)", position: "relative", minHeight: 180 }}>
-          <Link href={`/pitch/${pitch.pitch_id}`} style={{ display: "block", height: "100%" }}>
-            <div style={{ aspectRatio: "16 / 9", position: "relative", overflow: "hidden", height: "100%" }}>
-              {thumbnailUrl ? (
-                <Image src={thumbnailUrl} alt="" fill priority sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
-              ) : (
-                <Thumb kind={pitch.kind} />
-              )}
-            </div>
+        <div style={{ borderBottom: "1.5px solid var(--ink)", position: "relative", minHeight: 200, overflow: "hidden" }}>
+          <Link href={`/pitch/${pitch.pitch_id}`} style={{ position: "absolute", inset: 0, display: "block" }}>
+            {thumbnailUrl ? (
+              <Image src={thumbnailUrl} alt="" fill priority sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
+            ) : (
+              <Thumb kind={pitch.kind} />
+            )}
           </Link>
-          <span style={{ position: "absolute", left: 14, top: 14 }}>
+          <span style={{ position: "absolute", left: 14, top: 14, zIndex: 1 }}>
             <KindChip kind={pitch.kind} />
           </span>
           <span
-            style={{ position: "absolute", right: 14, top: 14, background: "var(--accent)", color: "#2a1c05", border: "1px solid var(--ink)", borderRadius: 999, padding: "3px 11px", fontSize: 11, fontWeight: 800, letterSpacing: ".04em", whiteSpace: "nowrap" }}
+            style={{ position: "absolute", right: 14, top: 14, zIndex: 1, background: "var(--accent)", color: "#2a1c05", border: "1px solid var(--ink)", borderRadius: 999, padding: "3px 11px", fontSize: 11, fontWeight: 800, letterSpacing: ".04em", whiteSpace: "nowrap" }}
           >
             ★ À la une
           </span>
