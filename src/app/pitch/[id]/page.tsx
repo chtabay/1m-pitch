@@ -1,8 +1,11 @@
-import { createClient, getUser } from "@/lib/supabase/server";
+import { createClient, getUser, getUserBalance } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
-import { formatUSD, timeAgo } from "@/lib/format";
+import { formatUSD, timeAgo, hoursSince } from "@/lib/format";
 import Link from "next/link";
 import Image from "next/image";
+import { KindChip, FundBar, Sparkline, Flame, Icon, sparkData, seedFrom } from "@/components/ui";
+import { InvestButton } from "@/components/InvestButton";
+import { computeVelocity, HOT_THRESHOLD } from "@/lib/game";
 import { PocSubmitForm } from "@/components/PocSubmitForm";
 import { PocValidateButton } from "@/components/PocValidateButton";
 import { ResourceForm } from "@/components/ResourceForm";
@@ -82,6 +85,7 @@ export default async function PitchDetailPage({
     { data: children },
     { data: archivedChildren },
     messagesResult,
+    momentumResult,
     user,
   ] = await Promise.all([
     supabase.from("votes").select("id, amount, voter_id").eq("pitch_id", id),
@@ -95,10 +99,13 @@ export default async function PitchDetailPage({
     pitch.depth === 2
       ? supabase.from("messages").select("id, content, created_at, author_id").eq("pitch_id", id).order("created_at", { ascending: true })
       : Promise.resolve({ data: null }),
+    supabase.from("pitch_momentum").select("invested_24h, votes_24h").eq("pitch_id", id).maybeSingle(),
     getUser(),
   ]);
 
   const isAuthor = user?.id === pitch.author_id;
+  const balance = user ? await getUserBalance(user.id) : 0;
+  const momentum = (momentumResult.data as { invested_24h: number; votes_24h: number } | null) ?? { invested_24h: 0, votes_24h: 0 };
 
   const totalFunded = (votes ?? []).reduce((s, v) => s + v.amount, 0);
   const investorCount = (votes ?? []).length;
@@ -159,13 +166,19 @@ export default async function PitchDetailPage({
       .sort((a, b) => b.share - a.share);
   }
 
-  const progress = Math.min(100, (totalFunded / 1_000_000) * 100);
+  const velocity = computeVelocity({
+    invested24h: Number(momentum.invested_24h),
+    votes24h: Number(momentum.votes_24h),
+    hoursAgo: hoursSince(pitch.created_at),
+    funded: totalFunded,
+  });
+  const canInvest = pitch.status === "open" || pitch.status === "poc_submitted";
 
   const backHref = pitch.parent_id ? `/pitch/${pitch.parent_id}` : "/";
   const backLabel = pitch.parent_id ? `← ${DEPTH_LABELS[pitch.depth - 1] ?? "Retour"}` : "← Accueil";
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-12">
+    <div className="view-in app-shell" style={{ paddingTop: 16, paddingBottom: 48, maxWidth: 680 }}>
       <Link
         href={backHref}
         className="mb-6 inline-block text-sm text-muted transition hover:text-foreground"
@@ -182,25 +195,16 @@ export default async function PitchDetailPage({
         </div>
       )}
 
-      <div className="mb-4 flex items-center gap-3">
-        <span className="rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs font-semibold text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
-          {depthLabel}
-        </span>
-        <span
-          className={`rounded-full px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wide ${
-            pitch.kind === "film"
-              ? "bg-blue-50 text-blue-900 dark:bg-blue-950/60 dark:text-blue-200"
-              : pitch.kind === "jeu"
-                ? "bg-emerald-50 text-emerald-900 dark:bg-emerald-950/60 dark:text-emerald-200"
-                : pitch.kind === "logiciel"
-                  ? "bg-amber-50 text-amber-900 dark:bg-amber-950/60 dark:text-amber-200"
-                  : "bg-purple-50 text-purple-900 dark:bg-purple-950/60 dark:text-purple-200"
-          }`}
-        >
-          {pitch.kind}
-        </span>
-        <StatusBadge status={pitch.status} />
-        <time className="text-xs text-muted">{timeAgo(pitch.created_at)}</time>
+      <div className="mb-4 flex flex-wrap items-center gap-2">
+        {pitch.depth > 0 && <span className="pill">{depthLabel}</span>}
+        <KindChip kind={pitch.kind} />
+        {pitch.status === "open" && velocity >= HOT_THRESHOLD && (
+          <span className="pill" style={{ borderColor: "var(--hot)", color: "var(--hot)" }}>
+            <Flame velocity={velocity} live />
+          </span>
+        )}
+        {pitch.status !== "open" && <StatusBadge status={pitch.status} />}
+        <time className="ml-auto text-xs text-muted">{timeAgo(pitch.created_at)}</time>
       </div>
 
       <h1 className="mb-2 text-3xl font-extrabold tracking-tight">
@@ -224,21 +228,46 @@ export default async function PitchDetailPage({
         </div>
       )}
 
-      <div className="mb-8">
-        <div className="flex items-center justify-between text-sm mb-2">
-          <span className="font-mono font-bold text-accent text-lg">
-            {formatUSD(totalFunded)}
-          </span>
-          <span className="text-muted">
-            {investorCount} investisseur{investorCount !== 1 && "s"} · / $1,000,000
-          </span>
+      <div className="card" style={{ padding: 18, marginBottom: 22 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 14, gap: 12 }}>
+          <div>
+            <div style={{ fontSize: 12, color: "var(--muted)" }}>Financement</div>
+            <div className="mono" style={{ fontSize: 28, fontWeight: 900, color: "var(--accent-dark)" }}>{formatUSD(totalFunded)}</div>
+            <div style={{ fontSize: 12, color: "var(--muted)" }}>
+              {investorCount} investisseur{investorCount !== 1 ? "s" : ""} · /$1M
+            </div>
+          </div>
+          <div style={{ textAlign: "right" }}>
+            <Sparkline data={sparkData(seedFrom(pitch.id), Math.max(0.3, velocity / 40))} w={92} h={38} color="var(--hot)" />
+            {Number(momentum.invested_24h) > 0 && (
+              <div className="delta tag-gain" style={{ marginTop: 6, fontSize: 11, justifyContent: "flex-end" }}>
+                <Icon name="arrowUp" size={11} />+{formatUSD(Number(momentum.invested_24h))} / 24h
+              </div>
+            )}
+          </div>
         </div>
-        <div className="h-3 w-full overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-700">
-          <div
-            className="h-full rounded-full bg-gradient-to-r from-amber-400 to-amber-600 transition-all duration-500"
-            style={{ width: `${progress}%` }}
+        <FundBar funded={totalFunded} shine={velocity >= HOT_THRESHOLD} />
+
+        {canInvest && !isAuthor && (
+          <InvestButton
+            pitchId={pitch.id}
+            title={pitch.title}
+            kind={pitch.kind}
+            funded={totalFunded}
+            balance={balance}
+            hasVoted={isInvestor}
+            disabled={!user}
+            block
           />
-        </div>
+        )}
+        {isAuthor && (
+          <div className="card-flat" style={{ marginTop: 16, padding: 12, fontSize: 12.5, color: "var(--muted)", background: "var(--card-2)" }}>
+            ✎ C&apos;est ton pitch —{" "}
+            {pitch.status === "poc_submitted"
+              ? `${approvalCount} ✓ / ${rejectionCount} ✗ sur la validation du livrable.`
+              : "soumets un livrable quand tu es prêt."}
+          </div>
+        )}
       </div>
 
       {author && (

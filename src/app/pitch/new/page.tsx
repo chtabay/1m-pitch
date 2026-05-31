@@ -1,81 +1,76 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { createPitch } from "@/app/actions/pitches";
+
+const inputStyle: React.CSSProperties = {
+  width: "100%",
+  marginTop: 6,
+  padding: "12px 14px",
+  borderRadius: 12,
+  border: "1.5px solid var(--ink)",
+  background: "var(--card)",
+  fontFamily: "var(--font-sans)",
+  fontSize: 15,
+  color: "var(--foreground)",
+  boxShadow: "var(--shadow-sm)",
+  outline: "none",
+};
+const labelStyle: React.CSSProperties = {
+  fontSize: 12,
+  fontWeight: 700,
+  color: "var(--muted)",
+  textTransform: "uppercase",
+  letterSpacing: ".08em",
+};
 
 export default async function NewPitchPage() {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
   if (!user) redirect("/");
 
   return (
-    <div className="mx-auto max-w-xl px-4 py-12">
-      <h1 className="mb-8 text-3xl font-extrabold tracking-tight">
-        Nouveau pitch
-      </h1>
+    <div className="view-in app-shell" style={{ paddingTop: 16, paddingBottom: 48, maxWidth: 600 }}>
+      <Link href="/" className="btn btn-sm btn-ghost" style={{ marginBottom: 18 }}>
+        ← Retour
+      </Link>
+      <h1 className="serif" style={{ fontSize: 30, fontWeight: 900, marginBottom: 6 }}>Une ligne. Un million.</h1>
+      <p className="serif italic" style={{ color: "var(--muted)", marginBottom: 24 }}>
+        Pitche une idée. La foule décide de sa valeur.
+      </p>
 
-      <form action={createPitch} className="space-y-6">
+      <form action={createPitch} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
         <div>
-          <label
-            htmlFor="kind"
-            className="mb-1 block text-sm font-medium"
-          >
-            Type
-          </label>
-          <select
-            name="kind"
-            id="kind"
-            className="w-full rounded-lg border border-zinc-300 bg-background px-3 py-2 text-sm focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30 dark:border-zinc-700"
-          >
-            <option value="film">Film</option>
-            <option value="concept">Concept</option>
-            <option value="jeu">Jeu</option>
-            <option value="logiciel">Logiciel</option>
+          <label htmlFor="kind" style={labelStyle}>Type</label>
+          <select name="kind" id="kind" defaultValue="film" style={inputStyle}>
+            <option value="film">🎬 Film</option>
+            <option value="concept">✦ Concept</option>
+            <option value="jeu">🎮 Jeu</option>
+            <option value="logiciel">💻 Logiciel</option>
           </select>
         </div>
 
         <div>
-          <label
-            htmlFor="title"
-            className="mb-1 block text-sm font-medium"
-          >
-            Titre du pitch
-          </label>
-          <input
-            type="text"
-            name="title"
-            id="title"
-            required
-            maxLength={200}
-            placeholder="Ex : Les Dents de la Terre"
-            className="w-full rounded-lg border border-zinc-300 bg-background px-3 py-2 text-sm focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30 dark:border-zinc-700"
-          />
+          <label htmlFor="title" style={labelStyle}>Titre</label>
+          <input type="text" name="title" id="title" required maxLength={200} placeholder="Le nom de ton idée" style={inputStyle} />
         </div>
 
         <div>
-          <label
-            htmlFor="one_liner"
-            className="mb-1 block text-sm font-medium"
-          >
-            Le pitch en une ligne
-          </label>
+          <label htmlFor="one_liner" style={labelStyle}>La ligne</label>
           <textarea
             name="one_liner"
             id="one_liner"
             required
             maxLength={500}
             rows={3}
-            placeholder="Ex : Un tremblement de terre géant traque un village côtier et dévore ses habitants un par un."
-            className="w-full resize-none rounded-lg border border-zinc-300 bg-background px-3 py-2 text-sm leading-relaxed focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30 dark:border-zinc-700"
+            placeholder="Décris l'idée en une phrase qui donne envie d'investir…"
+            style={{ ...inputStyle, resize: "none" }}
           />
         </div>
 
-        <button
-          type="submit"
-          className="w-full rounded-lg bg-accent py-3 text-sm font-bold text-zinc-900 transition hover:bg-accent-dark"
-        >
+        <button type="submit" className="btn btn-accent btn-block" style={{ marginTop: 4 }}>
           Publier le pitch
         </button>
       </form>

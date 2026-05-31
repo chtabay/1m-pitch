@@ -1,42 +1,43 @@
 import Link from "next/link";
-import { getUser, getUserBalance } from "@/lib/supabase/server";
+import type { User } from "@supabase/supabase-js";
 import { AuthButton } from "./AuthButton";
+import { DesktopNav } from "./Nav";
+import { Icon } from "./ui";
 import { formatUSD } from "@/lib/format";
 
-export async function Header() {
-  const user = await getUser();
-  const balance = user ? await getUserBalance(user.id) : 0;
+type Props = {
+  user: User | null;
+  balance: number;
+  level: number;
+  hasQuests: boolean;
+};
 
+export function Header({ user, balance, level, hasQuests }: Props) {
   return (
-    <header className="sticky top-0 z-50 border-b-2 border-ink bg-card/90 backdrop-blur">
-      <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4">
-        <Link href="/" className="flex items-center gap-2 font-serif font-bold text-lg">
-          <span className="inline-block text-accent text-3xl -rotate-6 transition-transform hover:rotate-0">$</span>
+    <header className="hdr">
+      <div className="app-shell hdr-in">
+        <Link href="/" className="brand">
+          <span className="dollar">$</span>
           <span>1M&nbsp;Pitch</span>
         </Link>
 
-        <nav className="flex items-center gap-2 sm:gap-4">
+        <DesktopNav userId={user?.id ?? null} hasQuests={hasQuests} />
+
+        <div className="hdr-right">
           {user && (
-            <>
-              <Link
-                href={`/profile/${user.id}`}
-                className="flex items-center gap-1.5 rounded-lg border-2 border-ink bg-card px-2 py-1.5 text-xs sm:px-3 sm:text-sm shadow-[2px_2px_0_0_theme(colors.ink)] transition-all hover:-translate-y-0.5 hover:shadow-[3px_3px_0_0_theme(colors.ink)] active:translate-y-0 active:shadow-[0_0px_0_0_theme(colors.ink)]"
-              >
-                <span className="font-mono font-semibold text-accent">
-                  {formatUSD(balance)}
-                </span>
-                <span className="text-muted">▸</span>
-              </Link>
-              <Link
-                href="/pitch/new"
-                className="whitespace-nowrap rounded-lg border-2 border-ink bg-accent px-3 py-2 text-xs sm:px-4 sm:text-sm font-semibold text-zinc-900 shadow-[2px_2px_0_0_theme(colors.ink)] transition-all hover:-translate-y-0.5 hover:shadow-[3px_3px_0_0_theme(colors.ink)] active:translate-y-0 active:shadow-[0_0px_0_0_theme(colors.ink)]"
-              >
-                + Pitch
-              </Link>
-            </>
+            <Link href="/portfolio" className="wallet-chip" aria-label="Portfolio">
+              <span className="lvl">{level}</span>
+              <span className="amt">{formatUSD(balance)}</span>
+            </Link>
+          )}
+          {user && (
+            <Link href="/pitch/new" className="btn-pitch">
+              <Icon name="plus" size={15} />
+              Pitch
+            </Link>
           )}
           <AuthButton user={user} />
-        </nav>
+        </div>
       </div>
     </header>
   );

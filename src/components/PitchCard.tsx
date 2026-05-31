@@ -1,6 +1,7 @@
-import { formatUSD, timeAgo } from "@/lib/format";
-import { PitchVoteButton } from "./PitchVoteButton";
-import { StatusBadge } from "./StatusBadge";
+import { timeAgo } from "@/lib/format";
+import { HOT_THRESHOLD } from "@/lib/game";
+import { KindChip, Flame, FundBar, Thumb } from "./ui";
+import { InvestButton } from "./InvestButton";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -9,10 +10,8 @@ type Props = {
     pitch_id: string;
     title: string;
     one_liner: string;
-    kind: "film" | "concept" | "jeu" | "logiciel";
+    kind: string;
     status: "open" | "poc_submitted" | "validated" | "rejected";
-    poc_url: string | null;
-    deck_url: string | null;
     created_at: string;
     vote_count: number;
     potential_usd: number;
@@ -24,13 +23,7 @@ type Props = {
   userBalance: number;
   isOwner: boolean;
   thumbnailUrl: string | null;
-};
-
-const KIND_COLORS: Record<string, string> = {
-  film: "bg-blue-50 text-blue-900 dark:bg-blue-950/60 dark:text-blue-200",
-  jeu: "bg-emerald-50 text-emerald-900 dark:bg-emerald-950/60 dark:text-emerald-200",
-  logiciel: "bg-amber-50 text-amber-900 dark:bg-amber-950/60 dark:text-amber-200",
-  concept: "bg-purple-50 text-purple-900 dark:bg-purple-950/60 dark:text-purple-200",
+  velocity?: number;
 };
 
 export function PitchCard({
@@ -41,119 +34,84 @@ export function PitchCard({
   userBalance,
   isOwner,
   thumbnailUrl,
+  velocity = 0,
 }: Props) {
-  const progress = Math.min(100, (pitch.potential_usd / 1_000_000) * 100);
-  const kindClass = KIND_COLORS[pitch.kind] ?? KIND_COLORS.concept;
-
+  const hot = velocity >= HOT_THRESHOLD;
   return (
-    <article className="group flex flex-col overflow-hidden rounded-2xl border-2 border-ink bg-card shadow-[4px_4px_0_0_theme(colors.ink)] transition-all duration-200 hover:-translate-y-1 hover:shadow-[6px_6px_0_0_theme(colors.ink)]">
-      <Link href={`/pitch/${pitch.pitch_id}`} className="block">
-        <div className="relative aspect-[16/9] w-full overflow-hidden border-b-2 border-ink bg-background">
-          {thumbnailUrl ? (
-            <Image
-              src={thumbnailUrl}
-              alt=""
-              fill
-              sizes="(max-width: 640px) 100vw, 33vw"
-              className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-            />
-          ) : (
-            <div className="flex h-full items-center justify-center text-6xl opacity-20">
-              {pitch.kind === "film" ? "🎬" : pitch.kind === "jeu" ? "🎮" : pitch.kind === "logiciel" ? "💻" : "✦"}
-            </div>
-          )}
-          <span className={`absolute left-3 top-3 rounded-full border border-ink px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wide ${kindClass}`}>
-            {pitch.kind}
+    <article className="card" style={{ display: "flex", flexDirection: "column", overflow: "hidden" }}>
+      <Link href={`/pitch/${pitch.pitch_id}`} style={{ display: "block" }}>
+        <div style={{ borderBottom: "1.5px solid var(--ink)", position: "relative" }}>
+          <div style={{ aspectRatio: "16 / 9", position: "relative", overflow: "hidden" }}>
+            {thumbnailUrl ? (
+              <Image src={thumbnailUrl} alt="" fill sizes="(max-width: 640px) 100vw, 33vw" className="object-cover" />
+            ) : (
+              <Thumb kind={pitch.kind} />
+            )}
+          </div>
+          <span style={{ position: "absolute", left: 12, top: 12 }}>
+            <KindChip kind={pitch.kind} />
           </span>
-          {pitch.status !== "open" && (
-            <div className="absolute right-3 top-3">
-              <StatusBadge status={pitch.status} />
-            </div>
+          {pitch.status === "open" && hot && (
+            <span
+              style={{ position: "absolute", right: 12, top: 12, background: "var(--card)", border: "1px solid var(--ink)", borderRadius: 999, padding: "2px 8px" }}
+            >
+              <Flame velocity={velocity} live />
+            </span>
+          )}
+          {pitch.status === "validated" && (
+            <span style={{ position: "absolute", right: 12, top: 12, background: "var(--gain)", color: "#fff", border: "1px solid var(--ink)", borderRadius: 999, padding: "3px 9px", fontSize: 11, fontWeight: 800 }}>
+              ✓ Validé
+            </span>
+          )}
+          {pitch.status === "poc_submitted" && (
+            <span style={{ position: "absolute", right: 12, top: 12, background: "var(--cool)", color: "#fff", border: "1px solid var(--ink)", borderRadius: 999, padding: "3px 9px", fontSize: 11, fontWeight: 800 }}>
+              ⚖ En revue
+            </span>
           )}
         </div>
       </Link>
 
-      <div className="flex flex-1 flex-col p-5">
-        <div className="mb-2 flex items-center justify-between text-xs text-muted">
-          <time>{timeAgo(pitch.created_at)}</time>
-          {isOwner && (
-            <Link
-              href={`/pitch/${pitch.pitch_id}/edit`}
-              className="transition hover:text-foreground"
-            >
-              ✎ Éditer
-            </Link>
-          )}
+      <div style={{ padding: 16, display: "flex", flexDirection: "column", flex: 1 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "var(--muted)", marginBottom: 6 }}>
+          <span>{timeAgo(pitch.created_at)}</span>
+          <span>
+            {pitch.vote_count} investisseur{pitch.vote_count !== 1 ? "s" : ""}
+          </span>
         </div>
-
-        <Link href={`/pitch/${pitch.pitch_id}`} className="block">
-          <h2 className="mb-1 font-serif text-xl font-bold leading-snug group-hover:text-accent transition">
+        <Link href={`/pitch/${pitch.pitch_id}`}>
+          <h3 className="serif" style={{ fontSize: 20, fontWeight: 800, lineHeight: 1.15, marginBottom: 6 }}>
             {pitch.title}
-          </h2>
-          <p className="mb-4 line-clamp-2 text-sm leading-relaxed text-muted">
-            {pitch.one_liner}
-          </p>
+          </h3>
         </Link>
+        <p
+          style={{ fontSize: 13.5, lineHeight: 1.5, color: "var(--muted)", margin: 0, marginBottom: 14, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}
+        >
+          {pitch.one_liner}
+        </p>
 
-        {(pitch.poc_url || pitch.deck_url) && (
-          <div className="mb-4 flex flex-wrap gap-2">
-            {pitch.poc_url && (
-              <a
-                href={pitch.poc_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 rounded-full bg-emerald-600 px-2.5 py-1 text-xs font-semibold text-white shadow-[0_2px_0_0_theme(colors.emerald.800)] transition-all hover:-translate-y-0.5 hover:shadow-[0_4px_0_0_theme(colors.emerald.800)] active:translate-y-0 active:shadow-[0_0px_0_0_theme(colors.emerald.800)] dark:bg-emerald-700 dark:shadow-[0_2px_0_0_theme(colors.emerald.950)] dark:hover:shadow-[0_4px_0_0_theme(colors.emerald.950)]"
-              >
-                📄 Livrable
-              </a>
-            )}
-            {pitch.deck_url && (
-              <a
-                href={pitch.deck_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 rounded-full bg-indigo-600 px-2.5 py-1 text-xs font-semibold text-white shadow-[0_2px_0_0_theme(colors.indigo.800)] transition-all hover:-translate-y-0.5 hover:shadow-[0_4px_0_0_theme(colors.indigo.800)] active:translate-y-0 active:shadow-[0_0px_0_0_theme(colors.indigo.800)] dark:bg-indigo-700 dark:shadow-[0_2px_0_0_theme(colors.indigo.950)] dark:hover:shadow-[0_4px_0_0_theme(colors.indigo.950)]"
-              >
-                📊 Deck
-              </a>
-            )}
-          </div>
-        )}
-
-        <div className="mt-auto">
-          <div className="mb-3">
-            <div className="mb-1 flex items-baseline justify-between">
-              <span className="font-mono text-base font-bold text-accent">
-                {formatUSD(pitch.potential_usd)}
-              </span>
-              <span className="text-xs text-muted">
-                {pitch.vote_count} {pitch.vote_count === 1 ? "vote" : "votes"}
-              </span>
-            </div>
-            <div className="h-2.5 w-full overflow-hidden rounded-full border border-ink bg-zinc-200 dark:bg-zinc-700">
-              <div
-                className="progress-shine h-full rounded-full bg-gradient-to-r from-amber-400 to-amber-600 transition-all duration-500"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between gap-3">
-            <span className="truncate text-xs text-muted">
-              {authorName ?? "Anonyme"}
+        <div style={{ marginTop: "auto" }}>
+          <FundBar funded={pitch.potential_usd} shine={hot} />
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, marginTop: 12 }}>
+            <span style={{ fontSize: 12, color: "var(--muted)", minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              par {authorName ?? "Anonyme"}
             </span>
-            {pitch.status !== "validated" && pitch.status !== "rejected" ? (
-              <PitchVoteButton
+            {pitch.status === "validated" ? (
+              <span className="pill" style={{ borderColor: "var(--gain)", color: "var(--gain)" }}>Actionnaire</span>
+            ) : pitch.status === "rejected" ? (
+              <Link href={`/pitch/${pitch.pitch_id}`} className="btn btn-sm btn-ghost">Voir</Link>
+            ) : isOwner ? (
+              <Link href={`/pitch/${pitch.pitch_id}`} className="btn btn-sm btn-ghost">Mon pitch</Link>
+            ) : (
+              <InvestButton
                 pitchId={pitch.pitch_id}
+                title={pitch.title}
+                kind={pitch.kind}
+                funded={pitch.potential_usd}
+                balance={userBalance}
                 hasVoted={hasVoted}
-                userBalance={userBalance}
                 disabled={!isLoggedIn}
               />
-            ) : hasVoted ? (
-              <span className="rounded-lg bg-amber-100 px-3 py-1.5 text-sm font-medium text-amber-900 dark:bg-amber-900/40 dark:text-amber-100">
-                ★ Investi
-              </span>
-            ) : null}
+            )}
           </div>
         </div>
       </div>
