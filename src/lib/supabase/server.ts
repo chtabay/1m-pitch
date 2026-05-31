@@ -42,3 +42,13 @@ export const getUserBalance = cache(async (userId: string) => {
     .single();
   return data?.balance ?? 0;
 });
+
+import type { QuestsState } from "@/lib/game";
+
+/** Server-computed gamification state for the signed-in user (cached per request). */
+export const getQuestsState = cache(async (): Promise<QuestsState | null> => {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("get_quests_state");
+  if (error || !data || (data as { ok?: boolean }).ok === false) return null;
+  return data as QuestsState;
+});
