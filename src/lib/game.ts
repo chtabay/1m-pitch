@@ -1,5 +1,5 @@
 // ============================================================
-// 1M Pitch — game model (pure helpers, no React/DB).
+// Ça ne sert à rien… — game model (pure helpers, no React/DB).
 // Drives the gamification UI from real data: XP/level, momentum
 // (velocity), ROI, badges, and the quest/bonus catalog.
 //

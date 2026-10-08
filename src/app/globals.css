@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /* ============================================================
-   1M PITCH — editorial design system (cream / ink / amber)
+   ÇA NE SERT À RIEN… — editorial design system (cream / ink / amber)
    Light-only paper aesthetic: the `dark` variant is neutralized
    so the brand stays consistent (matches the design prototype).
    ============================================================ */
@@ -135,8 +135,24 @@ body {
   display: flex; align-items: center; justify-content: space-between;
   gap: 12px;
 }
-.brand { display: flex; align-items: center; gap: 8px; font-family: var(--font-serif); font-weight: 800; font-size: 19px; }
+.brand {
+  display: flex; align-items: center; gap: 8px; min-width: 0;
+  font-family: var(--font-serif); font-weight: 800; font-size: 17px; line-height: 1.05;
+}
+/* The name is long. Below 1024px it stacks on two lines ("Ça ne sert / à rien…":
+   max-width sits between the width of "Ça ne sert" and "Ça ne sert à" so the break
+   lands after "sert"); from 1024px it runs on a single line. Either way it shrinks and
+   truncates on its own ellipsis rather than pushing the wallet / auth controls out. */
+.brand .name {
+  min-width: 0; max-width: 5em; letter-spacing: -.01em;
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;
+}
+@media (min-width: 1024px) {
+  .brand { font-size: 19px; }
+  .brand .name { display: block; max-width: none; white-space: nowrap; text-overflow: ellipsis; }
+}
 .brand .dollar {
+  flex: none;
   display: inline-grid; place-items: center;
   width: 30px; height: 30px; border-radius: 9px;
   background: var(--accent); color: #2a1c05;
@@ -145,7 +161,7 @@ body {
 }
 .brand:hover .dollar { transform: rotate(0deg); }
 
-.hdr-nav { display: none; align-items: center; gap: 4px; }
+.hdr-nav { display: none; align-items: center; gap: 4px; flex: none; }
 @media (min-width: 900px) { .hdr-nav { display: flex; } }
 .hdr-nav a {
   padding: 7px 13px; border-radius: 10px; font-size: 14px; font-weight: 600;
@@ -154,7 +170,7 @@ body {
 .hdr-nav a:hover { color: var(--foreground); background: var(--card-2); }
 .hdr-nav a.on { color: var(--foreground); background: var(--accent-soft); }
 
-.hdr-right { display: flex; align-items: center; gap: 10px; }
+.hdr-right { display: flex; align-items: center; gap: 10px; flex: none; }
 
 .wallet-chip {
   display: flex; align-items: center; gap: 8px;
@@ -178,6 +194,8 @@ body {
 }
 .btn-pitch:hover { transform: translateY(-1px); box-shadow: var(--shadow); }
 .btn-pitch:active { transform: translateY(0); box-shadow: none; }
+/* Below 900px the tab bar's "+" button already creates a pitch: free the header for the name. */
+@media (max-width: 899px) { .hdr .btn-pitch { display: none; } }
 
 /* ---------- Bottom tab bar (mobile) ---------- */
 .tabbar {

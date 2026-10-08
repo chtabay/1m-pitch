@@ -1,5 +1,5 @@
 // ============================================================
-// Presentational UI primitives for the 1M Pitch redesign.
+// Presentational UI primitives for the « Ça ne sert à rien… » redesign.
 // Server components (no hooks) — safe to use anywhere.
 // ============================================================
 import { formatUSD, formatPct } from "@/lib/format";
@@ -32,6 +32,12 @@ const ICON_PATHS: Record<string, React.ReactNode> = {
   arrowDown: <path d="M12 5v14M6 13l6 6 6-6" />,
   back: <path d="M15 18l-6-6 6-6" />,
   plus: <path d="M12 5v14M5 12h14" />,
+  logout: (
+    <>
+      <path d="M10 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h4" />
+      <path d="M15 8l5 4-5 4M20 12H9" />
+    </>
+  ),
   gift: (
     <>
       <rect x="3" y="8" width="18" height="13" rx="2" />

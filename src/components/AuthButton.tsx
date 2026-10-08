@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/client";
 import type { User } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { Icon } from "./ui";
 
 type Props = {
   user: User | null;
@@ -71,8 +72,14 @@ export function AuthButton({ user }: Props) {
         <span className="hidden text-sm text-muted sm:inline">
           {user.user_metadata?.full_name ?? user.email}
         </span>
-        <button onClick={handleLogout} className="rounded-lg border border-ink px-3 py-1.5 text-sm transition hover:bg-card">
-          Déconnexion
+        <button
+          onClick={handleLogout}
+          aria-label="Déconnexion"
+          title="Déconnexion"
+          className="flex items-center rounded-lg border border-ink px-2.5 py-1.5 text-sm transition hover:bg-card sm:px-3"
+        >
+          <span className="sm:hidden"><Icon name="logout" size={18} /></span>
+          <span className="hidden sm:inline">Déconnexion</span>
         </button>
       </div>
     );

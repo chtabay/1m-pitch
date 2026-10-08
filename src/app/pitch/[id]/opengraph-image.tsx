@@ -1,8 +1,9 @@
 import { ImageResponse } from "next/og";
 import { createClient } from "@/lib/supabase/server";
+import { SITE_NAME } from "@/lib/site";
 
 export const runtime = "edge";
-export const alt = "1M Pitch";
+export const alt = SITE_NAME;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -137,7 +138,7 @@ export default async function OgImage({
               color: "#1c1917",
             }}
           >
-            1M Pitch
+            {SITE_NAME}
           </div>
         </div>
       </div>

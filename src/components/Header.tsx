@@ -4,6 +4,7 @@ import { AuthButton } from "./AuthButton";
 import { DesktopNav } from "./Nav";
 import { Icon } from "./ui";
 import { formatUSD } from "@/lib/format";
+import { SITE_NAME } from "@/lib/site";
 
 type Props = {
   user: User | null;
@@ -18,7 +19,7 @@ export function Header({ user, balance, level, hasQuests }: Props) {
       <div className="app-shell hdr-in">
         <Link href="/" className="brand">
           <span className="dollar">$</span>
-          <span>1M&nbsp;Pitch</span>
+          <span className="name">{SITE_NAME}</span>
         </Link>
 
         <DesktopNav userId={user?.id ?? null} hasQuests={hasQuests} />

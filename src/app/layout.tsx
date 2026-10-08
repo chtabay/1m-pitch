@@ -4,6 +4,7 @@ import { Header } from "@/components/Header";
 import { TabBar } from "@/components/Nav";
 import { getUser, getUserBalance, getQuestsState } from "@/lib/supabase/server";
 import { computeLevel, hasClaimable } from "@/lib/game";
+import { SITE_NAME, SITE_DESCRIPTION } from "@/lib/site";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -23,8 +24,8 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "1M Pitch",
-  description: "One line. One million.",
+  title: SITE_NAME,
+  description: SITE_DESCRIPTION,
 };
 
 export default async function RootLayout({
@@ -55,7 +56,7 @@ export default async function RootLayout({
         <Header user={user} balance={balance} level={level} hasQuests={hasQuests} />
         <main className="flex-1">{children}</main>
         <footer className="has-tabbar border-t border-line-strong py-6 text-center text-sm text-muted font-serif italic">
-          1M Pitch — au commencement, une ligne.
+          {SITE_NAME} — au commencement, une ligne.
         </footer>
         {user && <TabBar userId={user.id} hasQuests={hasQuests} />}
       </body>

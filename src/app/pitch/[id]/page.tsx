@@ -6,6 +6,7 @@ import Image from "next/image";
 import { KindChip, FundBar, Sparkline, Flame, Icon, sparkData, seedFrom } from "@/components/ui";
 import { InvestButton } from "@/components/InvestButton";
 import { computeVelocity, HOT_THRESHOLD } from "@/lib/game";
+import { SITE_NAME } from "@/lib/site";
 import { PocSubmitForm } from "@/components/PocSubmitForm";
 import { PocValidateButton } from "@/components/PocValidateButton";
 import { ResourceForm } from "@/components/ResourceForm";
@@ -41,7 +42,7 @@ export async function generateMetadata({
 
   if (!pitch) return { title: "Pitch introuvable" };
 
-  const title = `${pitch.title} — 1M Pitch`;
+  const title = `${pitch.title} — ${SITE_NAME}`;
   const description = pitch.one_liner;
 
   return {
@@ -51,7 +52,7 @@ export async function generateMetadata({
       title,
       description,
       type: "article",
-      siteName: "1M Pitch",
+      siteName: SITE_NAME,
     },
     twitter: {
       card: "summary_large_image",
