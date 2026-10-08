@@ -5,6 +5,7 @@ import { DesktopNav } from "./Nav";
 import { Icon } from "./ui";
 import { formatUSD } from "@/lib/format";
 import { SITE_NAME } from "@/lib/site";
+import { BrandMark } from "./BrandMark";
 
 type Props = {
   user: User | null;
@@ -18,7 +19,7 @@ export function Header({ user, balance, level, hasQuests }: Props) {
     <header className="hdr">
       <div className="app-shell hdr-in">
         <Link href="/" className="brand">
-          <span className="dollar">$</span>
+          <span className="mark"><BrandMark size={30} /></span>
           <span className="name">{SITE_NAME}</span>
         </Link>
 

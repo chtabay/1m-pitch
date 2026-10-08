@@ -151,15 +151,14 @@ body {
   .brand { font-size: 19px; }
   .brand .name { display: block; max-width: none; white-space: nowrap; text-overflow: ellipsis; }
 }
-.brand .dollar {
+.brand .mark {
   flex: none;
   display: inline-grid; place-items: center;
-  width: 30px; height: 30px; border-radius: 9px;
-  background: var(--accent); color: #2a1c05;
-  border: 1.5px solid var(--ink); font-weight: 900;
+  width: 30px; height: 30px;
   transform: rotate(-6deg); transition: transform .25s;
 }
-.brand:hover .dollar { transform: rotate(0deg); }
+.brand .mark svg { display: block; }
+.brand:hover .mark { transform: rotate(0deg); }
 
 .hdr-nav { display: none; align-items: center; gap: 4px; flex: none; }
 @media (min-width: 900px) { .hdr-nav { display: flex; } }

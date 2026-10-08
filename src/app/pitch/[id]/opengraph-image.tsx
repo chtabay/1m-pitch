@@ -122,15 +122,12 @@ export default async function OgImage({
             gap: "12px",
           }}
         >
-          <div
-            style={{
-              fontSize: "40px",
-              fontWeight: 900,
-              color: "#f59e0b",
-            }}
-          >
-            $
-          </div>
+          <svg width="44" height="44" viewBox="0 0 32 32" style={{ transform: "rotate(-6deg)" }}>
+            <rect x="2" y="2" width="28" height="28" rx="8.5" fill="#f59e0b" stroke="#1c1917" strokeWidth="1.8" />
+            <circle cx="9.5" cy="18.6" r="2.5" fill="#1c1917" />
+            <circle cx="16" cy="18.6" r="2.5" fill="#1c1917" />
+            <circle cx="22.5" cy="18.6" r="2.5" fill="#1c1917" />
+          </svg>
           <div
             style={{
               fontSize: "28px",

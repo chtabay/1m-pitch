@@ -6,7 +6,9 @@ Chaque idée se pitche en une ligne (film, concept, jeu ou logiciel). Les membre
 capital fictif, investissent sur les idées des autres, proposent des sous-idées, puis valident
 le livrable de l'auteur. Une bonne partie des idées de mes dépôts GitHub y sont pitchées.
 
-Le nom du site se change en un seul endroit : `src/lib/site.ts`.
+Le nom du site se change en un seul endroit : `src/lib/site.ts`. Le logo, une tuile ambre qui porte
+les trois points de suspension du nom, vit dans `src/components/BrandMark.tsx` ; le favicon dans
+`src/app/icon.svg` (vectoriel) et `src/app/favicon.ico` (généré à partir du même dessin).
 
 ## Stack
 
